@@ -525,8 +525,8 @@ export default function FeedContainer() {
               key={story.id}
               className="relative h-[214px] w-[146px] shrink-0 overflow-hidden rounded-[26px] bg-ink"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1d4ed8] to-[#60a5fa]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#112032] via-[#112032]/50 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-br from-[#0f172a] via-[#1d4ed8] to-[#60a5fa]" />
+              <div className="absolute inset-0 bg-linear-to-t from-[#112032] via-[#112032]/50 to-transparent" />
               {story.isAdd ? (
                 <div className="absolute inset-x-0 bottom-0 flex h-full flex-col justify-between p-4">
                   <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent text-white shadow-lg">
