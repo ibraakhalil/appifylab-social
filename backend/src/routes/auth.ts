@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 
 import { db } from "@/db/client";
-import { users } from "@/db/schema";
+import { users } from "@/db/schama";
 import { badRequest, unauthorized } from "@/lib/errors";
 import { createToken } from "@/lib/jwt";
 import { normalizeEmail } from "@/lib/security";

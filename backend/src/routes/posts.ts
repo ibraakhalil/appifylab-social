@@ -2,7 +2,7 @@ import { and, asc, desc, eq, lt, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 import { db } from "@/db/client";
-import { comments, likes, posts, users } from "@/db/schema";
+import { comments, likes, posts, users } from "@/db/schama";
 import { badRequest, forbidden, notFound } from "@/lib/errors";
 import { sanitizeText } from "@/lib/security";
 import {
