@@ -17,8 +17,14 @@ export default function MobileHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line/70 bg-white/95 backdrop-blur lg:hidden">
-      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-4 sm:px-6">
+    <header
+      className="sticky top-0 z-50 border-b border-line/70 bg-white/95 backdrop-blur lg:hidden"
+      style={{ height: "var(--header-height)" }}
+    >
+      <div
+        className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6"
+        style={{ minHeight: "var(--header-height)" }}
+      >
         <Link href="/" className="shrink-0 text-lg font-semibold text-ink">
           Buddy Script
         </Link>

@@ -22,25 +22,31 @@ const exploreItems = [
 
 export default function LeftSidebar() {
   return (
-    <aside className="hide-scrollbar sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
-      <div className="space-y-5">
-        <section className="rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
-          <h2 className="mb-5 text-lg font-semibold text-ink">Explore</h2>
-          <ul className="space-y-3">
+    <aside
+      className="hide-scrollbar sticky overflow-y-auto pb-4"
+      style={{
+        top: "calc(var(--header-height) + var(--layout-offset))",
+        maxHeight: "calc(100vh - var(--header-height) - var(--layout-offset))",
+      }}
+    >
+      <div className="space-y-4">
+        <section className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+          <h2 className="mb-4 text-base font-semibold text-ink">Explore</h2>
+          <ul className="space-y-2">
             {exploreItems.map(({ label, icon: Icon, badge }) => (
               <li key={label}>
                 <Link
                   href="#"
-                  className="flex items-center justify-between rounded-2xl px-3 py-3 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
+                  className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-muted text-accent">
                       <Icon className="h-4 w-4" />
                     </span>
                     {label}
                   </span>
                   {badge ? (
-                    <span className="rounded-full border border-white bg-accent px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
+                    <span className="rounded-full bg-accent/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
                       {badge}
                     </span>
                   ) : null}
@@ -50,78 +56,72 @@ export default function LeftSidebar() {
           </ul>
         </section>
 
-        <section className="rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-ink">Suggested People</h2>
-            <Link className="text-xs font-semibold uppercase tracking-[0.16em] text-accent" href="#">
+        <section className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-base font-semibold text-ink">Suggested People</h2>
+            <Link className="text-xs font-semibold text-accent" href="#">
               See all
             </Link>
           </div>
-          {suggestedPeople.map((person) => (
-            <div key={person.id} className="mb-4 rounded-3xl bg-surface-muted p-4 last:mb-0">
-              <div className="flex items-start gap-3">
-                <Link href="#" className="shrink-0">
-                  <Image
-                    src={person.image}
-                    width={44}
-                    height={44}
-                    alt={person.name}
-                    className="h-11 w-11 rounded-full object-cover"
-                  />
-                </Link>
-                <div className="min-w-0 flex-1">
-                  <Link href="#" className="block text-sm font-semibold text-ink">
-                    {person.name}
+          <ul className="space-y-3">
+            {suggestedPeople.map((person) => (
+              <li key={person.id}>
+                <div className="flex items-center gap-3 rounded-xl border border-line px-3 py-3">
+                  <Link href="#" className="shrink-0">
+                    <Image
+                      src={person.image}
+                      width={40}
+                      height={40}
+                      alt={person.name}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
                   </Link>
-                  <p className="mt-1 text-xs text-muted">{person.role}</p>
+                  <div className="min-w-0 flex-1">
+                    <Link href="#" className="block text-sm font-semibold text-ink">
+                      {person.name}
+                    </Link>
+                    <p className="mt-0.5 text-xs text-muted">{person.role}</p>
+                  </div>
+                  <Link
+                    href="#"
+                    className="inline-flex items-center justify-center rounded-lg border border-line px-3 py-2 text-xs font-medium text-muted transition hover:border-accent/40 hover:text-accent"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                  </Link>
                 </div>
-              </div>
-              <Link
-                href="#"
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-line bg-white px-4 py-2.5 text-sm font-medium text-muted transition hover:border-accent/40 hover:text-accent"
-              >
-                <UserPlus className="h-4 w-4" />
-                Connect
-              </Link>
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
         </section>
 
-        <section className="rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-ink">Events</h2>
-            <Link href="#" className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+        <section className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-base font-semibold text-ink">Events</h2>
+            <Link href="#" className="text-xs font-semibold text-accent">
               See all
             </Link>
           </div>
-          {events.map((evt) => (
-            <Link key={evt.id} className="mb-4 block overflow-hidden rounded-3xl border border-line bg-surface-muted last:mb-0" href="#">
-              <Image
-                src={evt.image}
-                width={320}
-                height={160}
-                alt={evt.title}
-                className="h-32 w-full object-cover"
-              />
-              <div className="space-y-4 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex w-[60px] shrink-0 flex-col items-center rounded-2xl bg-white px-2 py-2 text-center shadow-sm">
-                    <span className="text-lg font-semibold leading-none text-ink">{evt.date.split(" ")[0]}</span>
-                    <span className="mt-1 text-sm font-medium uppercase tracking-[0.12em] text-muted">
+          <ul className="space-y-3">
+            {events.map((evt) => (
+              <li key={evt.id}>
+                <Link
+                  className="flex items-start gap-3 rounded-xl border border-line px-3 py-3 transition hover:bg-surface-muted"
+                  href="#"
+                >
+                  <div className="flex w-12 shrink-0 flex-col items-center rounded-xl bg-surface-muted px-2 py-2 text-center">
+                    <span className="text-base font-semibold leading-none text-ink">{evt.date.split(" ")[0]}</span>
+                    <span className="mt-1 text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
                       {evt.date.split(" ")[1]}
                     </span>
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-semibold leading-6 text-ink">{evt.title}</h3>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold leading-5 text-ink">{evt.title}</h3>
                     <p className="mt-1 text-xs text-muted">{evt.going} people going</p>
                   </div>
-                </div>
-                <span className="inline-flex rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-                  Going
-                </span>
-              </div>
-            </Link>
-          ))}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       </div>
     </aside>

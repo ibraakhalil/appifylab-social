@@ -17,8 +17,14 @@ export default function DesktopHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 hidden border-b border-line/70 bg-white/90 backdrop-blur lg:block">
-      <div className="mx-auto flex max-w-[1440px] items-center gap-5 px-6 py-4 xl:px-8">
+    <header
+      className="sticky top-0 z-50 hidden border-b border-line/70 bg-white/90 backdrop-blur lg:block"
+      style={{ height: "var(--header-height)" }}
+    >
+      <div
+        className="mx-auto flex max-w-[1440px] items-center gap-5 px-6 xl:px-8"
+        style={{ minHeight: "var(--header-height)" }}
+      >
         <Link href="/" className="shrink-0 text-lg font-semibold text-ink">
           Buddy Script
         </Link>

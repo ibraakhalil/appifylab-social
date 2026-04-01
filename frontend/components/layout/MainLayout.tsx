@@ -9,7 +9,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <DesktopHeader />
       <MobileHeader />
       <MobileBottomNav />
-      <main className="mx-auto max-w-[1440px] px-4 pb-24 pt-5 sm:px-6 lg:px-8 lg:pb-10 lg:pt-8">
+      <main
+        className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 "
+        style={{ paddingTop: "var(--layout-offset)" }}
+      >
         {children}
       </main>
     </div>

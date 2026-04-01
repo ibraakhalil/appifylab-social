@@ -11,6 +11,8 @@
   --accent: #1890ff;
   --accent-strong: #0f6edc;
   --success: #0acf83;
+  --header-height: 80px;
+  --layout-offset: 1rem;
 }
 
 @theme inline {
@@ -25,6 +27,7 @@
   --color-accent-strong: var(--accent-strong);
   --color-success: var(--success);
 }
+
 
 html {
   scroll-behavior: smooth;

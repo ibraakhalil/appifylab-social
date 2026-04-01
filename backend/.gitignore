@@ -33,3 +33,6 @@ data/*.db
 
 # Finder (MacOS) folder config
 .DS_Store
+
+database.db-wal
+database.db-shm
