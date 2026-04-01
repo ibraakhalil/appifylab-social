@@ -30,9 +30,14 @@ export default function FeedComposerSection({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const updateComposer = (updater: (current: FeedComposerState) => FeedComposerState) => {
+    setComposer((current) => updater(current));
+    setError(null);
+  };
+
   const handleCreatePost = async () => {
     if (!composer.contentText.trim() && !composer.imageUrl.trim()) {
-      setError("Write something or add an image URL before posting.");
+      setError("Write something or choose a photo before posting.");
       return;
     }
 
@@ -70,20 +75,20 @@ export default function FeedComposerSection({
       error={error}
       isSubmitting={isSubmitting}
       onContentTextChange={(value) =>
-        setComposer((current) => ({
+        updateComposer((current) => ({
           ...current,
           contentText: value,
         }))
       }
       onImageUrlChange={(value) =>
-        setComposer((current) => ({
+        updateComposer((current) => ({
           ...current,
           imageUrl: value,
         }))
       }
       onSubmit={handleCreatePost}
       onVisibilityChange={(value) =>
-        setComposer((current) => ({
+        updateComposer((current) => ({
           ...current,
           visibility: value,
         }))

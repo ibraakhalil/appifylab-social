@@ -41,6 +41,8 @@ export const stories = [
   { id: 2, name: "Ryan Roslansky", image: "/images/card_ppl2.png", mini: "/images/mini_pic.png" },
   { id: 3, name: "Ryan Roslansky", image: "/images/card_ppl3.png", mini: "/images/mini_pic.png" },
   { id: 4, name: "Ryan Roslansky", image: "/images/card_ppl4.png", mini: "/images/mini_pic.png" },
+  { id: 5, name: "Ryan Roslansky", image: "/images/card_ppl4.png", mini: "/images/mini_pic.png" },
+  { id: 6, name: "Ryan Roslansky", image: "/images/card_ppl4.png", mini: "/images/mini_pic.png" },
 ];
 
 export const posts = [

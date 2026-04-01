@@ -222,13 +222,10 @@ export default function FeedTimeline({
 
   return (
     <>
-      <div>
-        <h2 className="text-lg font-semibold text-ink">Top Posts</h2>
-        <p className="mt-1 text-sm text-muted">Fresh conversations from the community</p>
-      </div>
+
 
       {error ? (
-        <div className="rounded-[24px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       ) : null}
@@ -273,7 +270,7 @@ export default function FeedTimeline({
             void loadFeed(nextCursor);
           }}
           disabled={isLoadingMore}
-          className="w-full rounded-[24px] border border-line bg-white px-5 py-4 text-sm font-semibold text-ink shadow-[0_18px_45px_rgba(17,32,50,0.08)] transition hover:border-accent/40 hover:text-accent disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-lg border border-line bg-white px-5 py-4 text-sm font-semibold text-ink shadow-[0_18px_45px_rgba(17,32,50,0.08)] transition hover:border-accent/40 hover:text-accent disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoadingMore ? "Loading more..." : "Load more posts"}
         </button>

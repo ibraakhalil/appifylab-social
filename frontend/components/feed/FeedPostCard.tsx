@@ -55,7 +55,7 @@ export default function FeedPostCard({
   const visibilityLabel = post.visibility === "public" ? "Public" : "Private";
 
   return (
-    <article className="rounded-[28px] border border-white/70 bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
+    <article className="rounded-2xl border border-white/70 bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <Link href="#" className="shrink-0">
@@ -91,7 +91,7 @@ export default function FeedPostCard({
       <div className="mt-4 space-y-4">
         {post.contentText ? <p className="text-sm leading-7 text-muted">{post.contentText}</p> : null}
         {post.imageUrl ? (
-          <div className="overflow-hidden rounded-[24px] border border-line/70">
+          <div className="overflow-hidden rounded-lg border border-line/70">
             <img src={post.imageUrl} alt="" className="h-auto w-full object-cover" loading="lazy" />
           </div>
         ) : null}
