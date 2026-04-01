@@ -1,6 +1,6 @@
 import { defineConfig } from "drizzle-kit";
 
-const databaseUrl = process.env.DATABASE_URL ?? "./data/appifylab-social.db";
+const databaseUrl = process.env.DATABASE_URL ?? "./data/database.db";
 
 export default defineConfig({
   out: "./drizzle",

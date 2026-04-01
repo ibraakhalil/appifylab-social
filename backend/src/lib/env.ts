@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
-const databaseUrl = process.env.DATABASE_URL ?? "./data/appifylab-social.db";
+const databaseUrl = process.env.DATABASE_URL ?? "./data/database.db";
 const resolvedDatabasePath = resolve(process.cwd(), databaseUrl);
 
 mkdirSync(dirname(resolvedDatabasePath), { recursive: true });
