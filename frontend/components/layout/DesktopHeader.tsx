@@ -1,13 +1,26 @@
+"use client";
+
 import Link from "next/link";
-import Image from "next/image";
-import { Bell, ChevronDown, House, Search, UsersRound } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Bell, ChevronDown, House, LogOut, Search, UsersRound } from "lucide-react";
+
+import Avatar from "@/components/ui/Avatar";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DesktopHeader() {
+  const router = useRouter();
+  const { isAuthenticated, logout, user } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    router.replace("/login");
+  };
+
   return (
     <header className="sticky top-0 z-50 hidden border-b border-line/70 bg-white/90 backdrop-blur lg:block">
       <div className="mx-auto flex max-w-[1440px] items-center gap-5 px-6 py-4 xl:px-8">
-        <Link href="/" className="shrink-0">
-          <Image src="/images/logo.svg" alt="Logo" width={118} height={28} className="h-7 w-auto" priority />
+        <Link href="/" className="shrink-0 text-lg font-semibold text-ink">
+          Buddy Script
         </Link>
 
         <form className="relative hidden max-w-md flex-1 lg:block">
@@ -47,23 +60,30 @@ export default function DesktopHeader() {
           </button>
         </nav>
 
-        <button
-          className="flex items-center gap-3 rounded-full border border-line bg-white px-2.5 py-1.5 shadow-sm transition hover:border-accent/40 hover:shadow-[0_12px_30px_rgba(17,32,50,0.08)]"
-          type="button"
-        >
-          <Image
-            src="/images/profile.png"
-            width={40}
-            height={40}
-            alt="Profile"
-            className="h-10 w-10 rounded-full object-cover"
-          />
-          <div className="hidden text-left xl:block">
-            <p className="text-sm font-semibold text-ink">Dylan Field</p>
-            <p className="text-xs text-muted">Community profile</p>
-          </div>
-          <ChevronDown className="h-4 w-4 text-subtle" />
-        </button>
+        {isAuthenticated && user ? (
+          <button
+            className="flex items-center gap-3 rounded-full border border-line bg-white px-2.5 py-1.5 shadow-sm transition hover:border-accent/40 hover:shadow-[0_12px_30px_rgba(17,32,50,0.08)]"
+            type="button"
+            onClick={handleLogout}
+          >
+            <Avatar name={`${user.firstName} ${user.lastName}`} className="h-10 w-10 text-sm" />
+            <div className="hidden text-left xl:block">
+              <p className="text-sm font-semibold text-ink">
+                {user.firstName} {user.lastName}
+              </p>
+              <p className="text-xs text-muted">{user.email}</p>
+            </div>
+            <LogOut className="h-4 w-4 text-subtle" />
+            <ChevronDown className="h-4 w-4 text-subtle" />
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong"
+          >
+            Login
+          </Link>
+        )}
       </div>
     </header>
   );

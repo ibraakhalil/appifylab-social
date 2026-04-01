@@ -1,5 +1,9 @@
+"use client";
+
+import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Check,
@@ -7,11 +11,22 @@ import {
   Mail,
   ShieldCheck,
   Sparkles,
+  User,
   UserPlus,
 } from "lucide-react";
 
+import { useAuth } from "@/hooks/useAuth";
+
 type AuthPageProps = {
   mode: "login" | "registration";
+};
+
+type FormState = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  repeatPassword: string;
 };
 
 const authContent = {
@@ -45,16 +60,30 @@ const authContent = {
   },
 } as const;
 
+const initialFormState: FormState = {
+  email: "",
+  firstName: "",
+  lastName: "",
+  password: "",
+  repeatPassword: "",
+};
+
 function AuthInput({
-  label,
-  type,
-  placeholder,
   icon: Icon,
+  label,
+  name,
+  onChange,
+  placeholder,
+  type,
+  value,
 }: {
-  label: string;
-  type: string;
-  placeholder: string;
   icon: typeof Mail;
+  label: string;
+  name: keyof FormState;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  type: string;
+  value: string;
 }) {
   return (
     <label className="block">
@@ -62,8 +91,11 @@ function AuthInput({
       <span className="relative block">
         <Icon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle" />
         <input
-          type={type}
+          name={name}
+          onChange={onChange}
           placeholder={placeholder}
+          type={type}
+          value={value}
           className="h-12 w-full rounded-2xl border border-line bg-white pl-11 pr-4 text-sm text-ink outline-none transition focus:border-accent/50 focus:ring-4 focus:ring-accent/10"
         />
       </span>
@@ -74,6 +106,71 @@ function AuthInput({
 export default function AuthPage({ mode }: AuthPageProps) {
   const content = authContent[mode];
   const isRegistration = mode === "registration";
+  const router = useRouter();
+  const { isAuthenticated, isReady, login, register } = useAuth();
+  const [form, setForm] = useState<FormState>(initialFormState);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isReady && isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, isReady, router]);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+
+    if (isRegistration) {
+      if (!form.firstName.trim() || !form.lastName.trim()) {
+        setError("First name and last name are required.");
+        return;
+      }
+
+      if (form.password !== form.repeatPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (isRegistration) {
+        await register({
+          email: form.email.trim(),
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          password: form.password,
+        });
+      } else {
+        await login({
+          email: form.email.trim(),
+          password: form.password,
+        });
+      }
+
+      setForm(initialFormState);
+      router.replace("/");
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Unable to complete the request.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-page">
@@ -153,10 +250,11 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
             <button
               type="button"
-              className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-line bg-surface-muted text-sm font-medium text-ink transition hover:border-accent/40 hover:bg-accent/5"
+              disabled
+              className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-line bg-surface-muted text-sm font-medium text-ink opacity-70"
             >
               <Sparkles className="h-4 w-4 text-accent" />
-              {isRegistration ? "Register with Google" : "Sign in with Google"}
+              {isRegistration ? "Register with Google" : "Sign in with Google"} (Soon)
             </button>
 
             <div className="my-8 flex items-center gap-4">
@@ -165,16 +263,64 @@ export default function AuthPage({ mode }: AuthPageProps) {
               <span className="h-px flex-1 bg-line" />
             </div>
 
-            <form className="space-y-4">
-              <AuthInput label="Email" type="email" placeholder="you@example.com" icon={Mail} />
-              <AuthInput label="Password" type="password" placeholder="Enter your password" icon={LockKeyhole} />
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              {isRegistration ? (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <AuthInput
+                    label="First Name"
+                    type="text"
+                    placeholder="John"
+                    icon={User}
+                    name="firstName"
+                    value={form.firstName}
+                    onChange={handleChange}
+                  />
+                  <AuthInput
+                    label="Last Name"
+                    type="text"
+                    placeholder="Doe"
+                    icon={User}
+                    name="lastName"
+                    value={form.lastName}
+                    onChange={handleChange}
+                  />
+                </div>
+              ) : null}
+
+              <AuthInput
+                label="Email"
+                type="email"
+                placeholder="you@example.com"
+                icon={Mail}
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+              />
+              <AuthInput
+                label="Password"
+                type="password"
+                placeholder="Enter your password"
+                icon={LockKeyhole}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+              />
               {isRegistration ? (
                 <AuthInput
                   label="Repeat Password"
                   type="password"
                   placeholder="Repeat your password"
                   icon={ShieldCheck}
+                  name="repeatPassword"
+                  value={form.repeatPassword}
+                  onChange={handleChange}
                 />
+              ) : null}
+
+              {error ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
               ) : null}
 
               <div className={`flex gap-3 text-sm ${isRegistration ? "items-start" : "items-center justify-between"}`}>
@@ -187,17 +333,16 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   <span>{isRegistration ? "I agree to terms & conditions" : "Remember me"}</span>
                 </label>
                 {!isRegistration ? (
-                  <Link href="#" className="font-medium text-accent transition hover:text-accent-strong">
-                    Forgot password?
-                  </Link>
+                  <span className="font-medium text-subtle">JWT session enabled</span>
                 ) : null}
               </div>
 
               <button
-                type="button"
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-semibold text-white transition hover:bg-accent-strong"
+                type="submit"
+                disabled={isSubmitting || !isReady}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:bg-accent/60"
               >
-                {content.submitLabel}
+                {isSubmitting ? "Please wait..." : content.submitLabel}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>

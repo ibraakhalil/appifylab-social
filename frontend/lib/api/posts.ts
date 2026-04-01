@@ -1,0 +1,41 @@
+import { apiFetch } from "@/lib/api/client";
+import type { CommentsResponse, FeedResponse } from "@/lib/api/types";
+
+export type CreatePostInput = {
+  contentText?: string;
+  imageUrl?: string;
+  visibility: "public" | "private";
+};
+
+export type CreateCommentInput = {
+  content: string;
+  parentId?: string;
+};
+
+export const getFeed = (cursor?: string | null) =>
+  apiFetch<FeedResponse>(`/posts?limit=10${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`);
+
+export const createPost = (input: CreatePostInput) =>
+  apiFetch<{ id: string; message: string }>("/posts", {
+    body: JSON.stringify(input),
+    method: "POST",
+  });
+
+export const togglePostLike = (postId: string) =>
+  apiFetch<{ isLiked: boolean; likeCount: number }>(`/posts/${postId}/like`, {
+    method: "POST",
+  });
+
+export const getComments = (postId: string) =>
+  apiFetch<CommentsResponse>(`/posts/${postId}/comments`);
+
+export const createComment = (postId: string, input: CreateCommentInput) =>
+  apiFetch<{ id: string; message: string }>(`/posts/${postId}/comments`, {
+    body: JSON.stringify(input),
+    method: "POST",
+  });
+
+export const toggleCommentLike = (commentId: string) =>
+  apiFetch<{ isLiked: boolean; likeCount: number }>(`/comments/${commentId}/like`, {
+    method: "POST",
+  });
