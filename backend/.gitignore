@@ -36,3 +36,5 @@ data/*.db
 
 database.db-wal
 database.db-shm
+
+public

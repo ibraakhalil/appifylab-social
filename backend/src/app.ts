@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { serveStatic } from "hono/bun";
 
 import type { AppEnv } from "@/types/app";
 import { AppError } from "@/lib/errors";
@@ -10,6 +11,14 @@ import commentsRoutes from "@/routes/comments";
 import postsRoutes from "@/routes/posts";
 
 const app = new Hono<AppEnv>();
+
+app.use(
+  "/public/*",
+  serveStatic({
+    rewriteRequestPath: (path) => path.replace(/^\//, ""),
+    root: "./",
+  }),
+);
 
 app.use(
   "*",

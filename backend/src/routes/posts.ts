@@ -5,6 +5,7 @@ import { db } from "@/db/client";
 import { comments, likes, posts, users } from "@/db/schama";
 import { badRequest, forbidden, notFound } from "@/lib/errors";
 import { sanitizeText } from "@/lib/security";
+import { storePostImage } from "@/lib/uploads";
 import {
   createCommentSchema,
   createPostSchema,
@@ -198,9 +199,70 @@ postsRoutes.get("/", queryValidator(postFeedQuerySchema), async (c) => {
   });
 });
 
-postsRoutes.post("/", jsonValidator(createPostSchema), async (c) => {
+postsRoutes.post("/", async (c) => {
   const authUser = c.get("authUser");
-  const payload = c.req.valid("json");
+  const contentType = c.req.header("content-type") ?? "";
+
+  let payload: {
+    contentText?: string;
+    imageUrl?: string | null;
+    visibility: "public" | "private";
+  };
+
+  if (contentType.includes("multipart/form-data")) {
+    const formData = await c.req.formData();
+    const contentTextValue = formData.get("contentText");
+    const visibilityValue = formData.get("visibility");
+    const imageValue = formData.get("image");
+
+    if (contentTextValue !== null && typeof contentTextValue !== "string") {
+      throw badRequest("Invalid request body.");
+    }
+
+    if (visibilityValue !== null && typeof visibilityValue !== "string") {
+      throw badRequest("Invalid request body.");
+    }
+
+    if (imageValue !== null && !(imageValue instanceof File)) {
+      throw badRequest("Invalid image upload.");
+    }
+
+    const parsed = createPostSchema.safeParse({
+      contentText: contentTextValue ?? undefined,
+      visibility: visibilityValue ?? undefined,
+    });
+
+    if (!parsed.success) {
+      throw badRequest("Invalid request body.");
+    }
+
+    payload = {
+      contentText: parsed.data.contentText,
+      imageUrl:
+        imageValue && imageValue.size > 0 ? await storePostImage(imageValue, c.req.url) : null,
+      visibility: parsed.data.visibility,
+    };
+  } else {
+    let requestBody: unknown;
+
+    try {
+      requestBody = await c.req.json();
+    } catch {
+      throw badRequest("Invalid request body.");
+    }
+
+    const parsed = createPostSchema.safeParse(requestBody);
+
+    if (!parsed.success) {
+      throw badRequest("Invalid request body.");
+    }
+
+    payload = {
+      ...parsed.data,
+      imageUrl: parsed.data.imageUrl?.trim() ?? null,
+    };
+  }
+
   const contentText = payload.contentText ? sanitizeText(payload.contentText) : null;
   const imageUrl = payload.imageUrl?.trim() ?? null;
 

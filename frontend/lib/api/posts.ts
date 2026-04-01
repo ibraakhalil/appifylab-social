@@ -2,9 +2,7 @@ import { apiFetch } from "@/lib/api/client";
 import type { CommentsResponse, FeedResponse } from "@/lib/api/types";
 
 export type CreatePostInput = {
-  contentText?: string;
-  imageUrl?: string;
-  visibility: "public" | "private";
+  formData: FormData;
 };
 
 export type CreateCommentInput = {
@@ -15,9 +13,9 @@ export type CreateCommentInput = {
 export const getFeed = (cursor?: string | null) =>
   apiFetch<FeedResponse>(`/posts?limit=10${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`);
 
-export const createPost = (input: CreatePostInput) =>
+export const createPost = ({ formData }: CreatePostInput) =>
   apiFetch<{ id: string; message: string }>("/posts", {
-    body: JSON.stringify(input),
+    body: formData,
     method: "POST",
   });
 

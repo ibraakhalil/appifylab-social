@@ -22,7 +22,8 @@ import { cn } from "@/lib/utils";
 
 export type FeedComposerState = {
   contentText: string;
-  imageUrl: string;
+  imageFile: File | null;
+  imagePreviewUrl: string;
   visibility: "public" | "private";
 };
 
@@ -33,7 +34,7 @@ type FeedComposerProps = {
   error: string | null;
   isSubmitting: boolean;
   onContentTextChange: (value: string) => void;
-  onImageUrlChange: (value: string) => void;
+  onImageChange: (file: File | null) => void;
   onSubmit: () => Promise<void>;
   onVisibilityChange: (value: FeedComposerState["visibility"]) => void;
 };
@@ -45,7 +46,7 @@ export default function FeedComposer({
   error,
   isSubmitting,
   onContentTextChange,
-  onImageUrlChange,
+  onImageChange,
   onSubmit,
   onVisibilityChange,
 }: FeedComposerProps) {
@@ -68,15 +69,7 @@ export default function FeedComposer({
       return;
     }
 
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        onImageUrlChange(reader.result);
-      }
-    };
-
-    reader.readAsDataURL(file);
+    onImageChange(file);
   };
 
   const visibilityLabel = composer.visibility === "public" ? "Public" : "Private";
@@ -93,14 +86,14 @@ export default function FeedComposer({
               onChange={(event) => onContentTextChange(event.target.value)}
               className={cn(
                 "min-h-28 w-full rounded-lg border border-transparent bg-surface-muted px-5 py-4 text-sm text-ink outline-none transition focus:border-accent/50 focus:bg-white",
-                composer.imageUrl ? "pr-28" : undefined,
+                composer.imagePreviewUrl ? "pr-28" : undefined,
               )}
               placeholder={`What's on your mind, ${currentUserFirstName}?`}
             />
-            {composer.imageUrl ? (
+            {composer.imagePreviewUrl ? (
               <div className="absolute right-4 top-4 flex items-start gap-2 rounded-2xl border border-white/80 bg-white/95 p-2 shadow-[0_10px_30px_rgba(17,32,50,0.14)]">
                 <Image
-                  src={composer.imageUrl}
+                  src={composer.imagePreviewUrl}
                   alt="Selected preview"
                   width={56}
                   height={56}
@@ -111,7 +104,7 @@ export default function FeedComposer({
                   aria-label="Remove selected photo"
                   className="rounded-full p-1 text-muted transition hover:bg-surface-muted hover:text-ink"
                   type="button"
-                  onClick={() => onImageUrlChange("")}
+                  onClick={() => onImageChange(null)}
                 >
                   <X className="h-4 w-4" />
                 </button>
