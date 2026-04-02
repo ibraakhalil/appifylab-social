@@ -2,9 +2,11 @@ import { type ChangeEvent, type FormEvent, useRef } from "react";
 import {
   CalendarDays,
   ChevronDown,
+  CircleIcon,
   Globe,
   ImagePlus,
   Lock,
+  SendHorizontalIcon,
   Video,
   X,
 } from "lucide-react";
@@ -78,7 +80,7 @@ export default function FeedComposer({
   return (
     <section className="rounded-2xl bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
       <div className="flex items-start gap-3">
-        <Avatar name={currentUserName} className="mt-1 size-11 text-sm" />
+        <Avatar name={currentUserName} className="mt-1 max-sm:hidden size-11 text-sm" />
         <form className="flex-1 space-y-3" onSubmit={handleSubmit}>
           <div className="relative">
             <textarea
@@ -118,41 +120,41 @@ export default function FeedComposer({
             </div>
           ) : null}
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                className="flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
-                type="button"
-              >
-                <Video className="h-4 w-4 text-accent" />
-                Live
-              </button>
-              <button
-                className="flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
+          <div className="mt-4 flex items-center lg:flex-wrap justify-between gap-3">
+            <div className="flex items-center gap-2">
+             <button
+                className="flex items-center justify-center gap-2 rounded-2xl px-3  text-sm font-medium text-muted transition  hover:text-ink"
                 type="button"
                 onClick={handlePhotoButtonClick}
               >
                 <ImagePlus className="h-4 w-4 text-success" />
-                Photo
+                <span className="max-md:hidden">Photo</span>
               </button>
               <button
-                className="flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
+                className="flex items-center justify-center gap-2 rounded-2xl px-3  text-sm font-medium text-muted transition  hover:text-ink"
+                type="button"
+              >
+                <Video className="h-4 w-4 text-accent" />
+               <span className="max-md:hidden">Live</span>
+              </button>
+              <button
+                className="flex items-center justify-center gap-2 rounded-2xl px-3  text-sm font-medium text-muted transition  hover:text-ink"
                 type="button"
               >
                 <CalendarDays className="h-4 w-4 text-[#fb8c00]" />
-                Event
+                <span className="max-md:hidden">Event</span>
               </button>
             </div>
 
-            <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+            <div className="flex w-full items-center justify-end gap-4 sm:w-auto">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="flex h-11 items-center justify-between gap-2 rounded-lg  bg-gray-100 px-4 text-sm text-ink outline-none transition hover:border-accent/50 focus:border-accent/50"
+                    className="flex items-center justify-between gap-2  bg-gray-100 py-0.5 rounded-full  px-2 text-[13px] text-ink outline-none transition  focus:border-accent/50"
                     type="button"
                   >
-                    <VisibilityIcon className="h-4 w-4 text-muted" />
-                    <span>{visibilityLabel}</span>
+                    <VisibilityIcon className="size-3.5 text-muted" />
+                    <span >{visibilityLabel}</span>
                     <ChevronDown className="h-4 w-4 text-muted" />
                   </button>
                 </DropdownMenuTrigger>
@@ -179,11 +181,10 @@ export default function FeedComposer({
                 </DropdownMenuContent>
               </DropdownMenu>
               <button
-                className="rounded-lg h-11 cursor-pointer bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:bg-accent/60"
                 type="submit"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Posting..." : "Post"}
+                {isSubmitting ? <CircleIcon/> : <SendHorizontalIcon className="text-accent size-5"/>}
               </button>
             </div>
           </div>

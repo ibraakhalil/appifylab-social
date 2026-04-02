@@ -37,16 +37,16 @@ export default function LeftSidebar() {
               <li key={label}>
                 <Link
                   href="#"
-                  className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
+                  className="flex items-center justify-between rounded-xl  py-1.5 text-sm font-medium transition hover:text-gray-100"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-muted text-accent">
+                    <span className="flex items-center justify-center rounded-xl bg-surface-muted text-accent">
                       <Icon className="h-4 w-4" />
                     </span>
                     {label}
                   </span>
                   {badge ? (
-                    <span className="rounded-full bg-accent/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
+                    <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
                       {badge}
                     </span>
                   ) : null}

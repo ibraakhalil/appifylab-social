@@ -116,8 +116,8 @@ export default function FeedPostCard({
 
         <div className="mt-4 flex flex-col gap-3 border-b border-line/70 pb-4 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <div className="inline-flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-white">
-              <ThumbsUp className="h-4 w-4" />
+            <span className="flex size-6 items-center justify-center rounded-full bg-accent text-white">
+              <ThumbsUp className="size-3" />
             </span>
             <button
               type="button"
@@ -143,7 +143,7 @@ export default function FeedPostCard({
             onClick={onLike}
           >
             <ThumbsUp className="h-4 w-4" />
-            Like
+           {post.isLiked ? "Liked" : "Like"}
           </button>
           <button
             className="flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
