@@ -113,7 +113,7 @@ export default function ProfileContent({
         </div>
       ) : null}
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-[0_24px_60px_rgba(17,32,50,0.08)]">
+      <section className="overflow-hidden rounded-4xl border border-white/70 bg-white shadow-[0_24px_60px_rgba(17,32,50,0.08)]">
         <div className="bg-[linear-gradient(135deg,#112032_0%,#0f6edc_55%,#7ec8ff_100%)] px-6 py-10 text-white sm:px-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-center gap-4 sm:gap-5">

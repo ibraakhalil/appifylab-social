@@ -119,12 +119,10 @@ export default function DesktopHeader() {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Link
-            href="/login"
-            className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong"
+          <div
+            className=" size-11 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong"
           >
-            Login
-          </Link>
+          </div>
         )}</div>
 
       </div>

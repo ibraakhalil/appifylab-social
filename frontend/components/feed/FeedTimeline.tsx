@@ -14,8 +14,8 @@ import {
 } from "@/lib/api/posts";
 import type { ApiUser, CommentItem, FeedPost, FeedResponse } from "@/lib/api/types";
 
-import FeedLoadingState from "./FeedLoadingState";
 import FeedPostCard from "./FeedPostCard";
+import FeedSkeleton from "./FeedSkeleton";
 import { updateCommentLikeState, updateReplyLikeState } from "./feedUtils";
 
 type PostCommentsState = Record<string, CommentItem[]>;
@@ -311,7 +311,7 @@ export default function FeedTimeline({
   };
 
   if (isFeedLoading) {
-    return <FeedLoadingState />;
+    return <FeedSkeleton postCount={2} showComposer={false} showStories={false} />;
   }
 
   return (

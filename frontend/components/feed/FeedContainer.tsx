@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 import FeedContent from "./FeedContent";
-import FeedLoadingState from "./FeedLoadingState";
+import FeedSkeleton from "./FeedSkeleton";
 
 export default function FeedContainer() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function FeedContainer() {
   }, [isAuthenticated, isReady, router]);
 
   if (!isReady || !isAuthenticated) {
-    return <FeedLoadingState />;
+    return <FeedSkeleton />;
   }
 
   return <FeedContent onUnauthorized={handleUnauthorized} user={user} />;
