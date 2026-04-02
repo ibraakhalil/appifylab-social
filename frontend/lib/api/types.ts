@@ -35,6 +35,24 @@ export type LikesResponse = {
   items: ApiUser[];
 };
 
+export type ProfileUser = ApiUser & {
+  createdAt: string;
+};
+
+export type ProfileStats = {
+  postCount: number;
+  privatePostCount: number;
+  publicPostCount: number;
+  totalCommentCount: number;
+};
+
+export type ProfileResponse = {
+  isCurrentUser: boolean;
+  stats: ProfileStats;
+  user: ProfileUser;
+  viewerCanSeePrivatePosts: boolean;
+};
+
 export type CommentItem = {
   author: ApiUser;
   content: string;

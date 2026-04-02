@@ -16,7 +16,7 @@ import Avatar from "@/components/ui/Avatar";
 
 import CommentThread from "./CommentThread";
 import ReactionUsersDialog from "./ReactionUsersDialog";
-import { formatRelativeTime } from "./feedUtils";
+import { buildProfileHref, formatRelativeTime } from "./feedUtils";
 
 type FeedPostCardProps = {
   activeReplyId: string | null;
@@ -72,11 +72,14 @@ export default function FeedPostCard({
       <article className="rounded-2xl border border-white/70 bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="#" className="shrink-0">
+            <Link href={buildProfileHref(post.author.id)} className="shrink-0">
               <Avatar name={`${post.author.firstName} ${post.author.lastName}`} className="h-11 w-11 text-sm" />
             </Link>
             <div className="min-w-0">
-              <Link href="#" className="block text-sm font-semibold text-ink">
+              <Link
+                href={buildProfileHref(post.author.id)}
+                className="block text-sm font-semibold text-ink transition hover:text-accent"
+              >
                 {post.author.firstName} {post.author.lastName}
               </Link>
               <div className="mt-1 flex items-center gap-2 text-xs text-muted">

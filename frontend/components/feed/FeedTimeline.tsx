@@ -7,13 +7,12 @@ import {
   createComment,
   createReply,
   getComments,
-  getFeed,
   getPostLikes,
   toggleCommentLike,
   togglePostLike,
   toggleReplyLike,
 } from "@/lib/api/posts";
-import type { ApiUser, CommentItem, FeedPost } from "@/lib/api/types";
+import type { ApiUser, CommentItem, FeedPost, FeedResponse } from "@/lib/api/types";
 
 import FeedLoadingState from "./FeedLoadingState";
 import FeedPostCard from "./FeedPostCard";
@@ -24,12 +23,18 @@ type PostReactionsState = Record<string, ApiUser[]>;
 
 type FeedTimelineProps = {
   currentUserName: string;
+  emptyStateMessage?: string;
+  loadPosts: (cursor?: string | null) => Promise<FeedResponse>;
+  loadMoreLabel?: string;
   onUnauthorized: () => void;
   refreshKey: number;
 };
 
 export default function FeedTimeline({
   currentUserName,
+  emptyStateMessage = "No posts yet.",
+  loadPosts,
+  loadMoreLabel = "Load more posts",
   onUnauthorized,
   refreshKey,
 }: FeedTimelineProps) {
@@ -50,7 +55,7 @@ export default function FeedTimeline({
 
   const loadFeed = useCallback(async (cursor?: string | null) => {
     try {
-      const response = await getFeed(cursor);
+      const response = await loadPosts(cursor);
       setPosts((current) => (cursor ? [...current, ...response.items] : response.items));
       setNextCursor(response.nextCursor);
       setError(null);
@@ -65,7 +70,7 @@ export default function FeedTimeline({
       setIsFeedLoading(false);
       setIsLoadingMore(false);
     }
-  }, [onUnauthorized]);
+  }, [loadPosts, onUnauthorized]);
 
   const loadCommentsForPost = useCallback(async (postId: string) => {
     setLoadingCommentsForPostId(postId);
@@ -357,6 +362,12 @@ export default function FeedTimeline({
         />
       ))}
 
+      {!posts.length && !nextCursor ? (
+        <div className="rounded-2xl border border-line bg-white px-5 py-10 text-center shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
+          <p className="text-sm font-medium text-ink">{emptyStateMessage}</p>
+        </div>
+      ) : null}
+
       {nextCursor ? (
         <button
           type="button"
@@ -367,7 +378,7 @@ export default function FeedTimeline({
           disabled={isLoadingMore}
           className="w-full rounded-lg border border-line bg-white px-5 py-4 text-sm font-semibold text-ink shadow-[0_18px_45px_rgba(17,32,50,0.08)] transition hover:border-accent/40 hover:text-accent disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isLoadingMore ? "Loading more..." : "Load more posts"}
+          {isLoadingMore ? "Loading more..." : loadMoreLabel}
         </button>
       ) : null}
     </>

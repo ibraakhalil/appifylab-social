@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
 
 import Avatar from "@/components/ui/Avatar";
@@ -11,6 +12,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ApiUser } from "@/lib/api/types";
+
+import { buildProfileHref } from "./feedUtils";
 
 type ReactionUsersDialogProps = {
   description: string;
@@ -60,14 +63,19 @@ export default function ReactionUsersDialog({
                 key={user.id}
                 className="flex items-center gap-3 rounded-2xl border border-line/70 bg-surface-muted/60 px-3 py-3"
               >
-                <Avatar
-                  name={`${user.firstName} ${user.lastName}`}
-                  className="h-9 w-9 shrink-0 text-xs"
-                />
+                <Link href={buildProfileHref(user.id)} className="shrink-0">
+                  <Avatar
+                    name={`${user.firstName} ${user.lastName}`}
+                    className="h-9 w-9 shrink-0 text-xs"
+                  />
+                </Link>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-ink">
+                  <Link
+                    href={buildProfileHref(user.id)}
+                    className="truncate text-sm font-medium text-ink transition hover:text-accent"
+                  >
                     {user.firstName} {user.lastName}
-                  </p>
+                  </Link>
                   <p className="truncate text-xs text-muted">{user.email}</p>
                 </div>
               </div>

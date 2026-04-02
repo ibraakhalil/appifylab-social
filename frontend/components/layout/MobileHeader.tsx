@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Bell, LogOut, Search } from "lucide-react";
 
 import Avatar from "@/components/ui/Avatar";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function MobileHeader() {
+  const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout, user } = useAuth();
 
@@ -48,15 +49,27 @@ export default function MobileHeader() {
             </span>
           </button>
           {isAuthenticated && user ? (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex items-center gap-2 rounded-full bg-surface-muted px-2 py-1.5 text-muted transition hover:bg-accent/10 hover:text-accent"
-              aria-label="Logout"
-            >
-              <Avatar name={`${user.firstName} ${user.lastName}`} className="h-8 w-8 text-xs" />
-              <LogOut className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/profile"
+                className={`rounded-full px-2 py-1.5 transition ${
+                  pathname === "/profile"
+                    ? "bg-accent/10 text-accent"
+                    : "bg-surface-muted text-muted hover:bg-accent/10 hover:text-accent"
+                }`}
+                aria-label="Profile"
+              >
+                <Avatar name={`${user.firstName} ${user.lastName}`} className="h-8 w-8 text-xs" />
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center gap-2 rounded-full bg-surface-muted px-2 py-1.5 text-muted transition hover:bg-accent/10 hover:text-accent"
+                aria-label="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           ) : (
             <Link
               href="/login"

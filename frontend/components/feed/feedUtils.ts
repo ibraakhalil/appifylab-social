@@ -1,5 +1,7 @@
 import type { CommentItem } from "@/lib/api/types";
 
+export const buildProfileHref = (userId: string) => `/profile/${userId}`;
+
 export const formatRelativeTime = (value: string) => {
   const date = new Date(value);
   const diffInSeconds = Math.max(1, Math.floor((Date.now() - date.getTime()) / 1000));

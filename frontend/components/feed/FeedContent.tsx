@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
+import { getFeed } from "@/lib/api/posts";
 import type { SessionUser } from "@/lib/auth/session";
 
 import FeedComposerSection from "./FeedComposerSection";
@@ -15,6 +16,7 @@ type FeedContentProps = {
 
 export default function FeedContent({ onUnauthorized, user }: FeedContentProps) {
   const [refreshKey, setRefreshKey] = useState(0);
+  const loadPosts = useCallback((cursor?: string | null) => getFeed(cursor), []);
 
   const currentUserName = user ? `${user.firstName} ${user.lastName}` : "User";
   const currentUserFirstName = user?.firstName ?? "there";
@@ -35,6 +37,7 @@ export default function FeedContent({ onUnauthorized, user }: FeedContentProps) 
 
       <FeedTimeline
         currentUserName={currentUserName}
+        loadPosts={loadPosts}
         onUnauthorized={onUnauthorized}
         refreshKey={refreshKey}
       />

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useState } from "react";
 
 import { ApiError } from "@/lib/api/client";
@@ -6,7 +7,7 @@ import Avatar from "@/components/ui/Avatar";
 import type { ApiUser, CommentItem, ReplyItem } from "@/lib/api/types";
 
 import ReactionUsersDialog from "./ReactionUsersDialog";
-import { formatRelativeTime } from "./feedUtils";
+import { buildProfileHref, formatRelativeTime } from "./feedUtils";
 
 type CommentThreadProps = {
   activeReplyId: string | null;
@@ -62,12 +63,17 @@ function ReplyCard({
     <>
       <div className="rounded-3xl bg-white p-4 shadow-sm">
         <div className="flex items-start gap-3">
-          <Avatar name={`${reply.author.firstName} ${reply.author.lastName}`} className="h-9 w-9 text-sm" />
+          <Link href={buildProfileHref(reply.author.id)} className="shrink-0">
+            <Avatar name={`${reply.author.firstName} ${reply.author.lastName}`} className="h-9 w-9 text-sm" />
+          </Link>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-semibold text-ink">
+              <Link
+                href={buildProfileHref(reply.author.id)}
+                className="text-sm font-semibold text-ink transition hover:text-accent"
+              >
                 {reply.author.firstName} {reply.author.lastName}
-              </p>
+              </Link>
               <span className="text-xs text-muted">{formatRelativeTime(reply.createdAt)}</span>
             </div>
             <p className="mt-2 text-sm leading-6 text-muted">{reply.content}</p>
@@ -151,12 +157,17 @@ export default function CommentThread({
       <div className="space-y-3">
         <div className="rounded-3xl bg-surface-muted p-4">
           <div className="flex items-start gap-3">
-            <Avatar name={`${comment.author.firstName} ${comment.author.lastName}`} className="h-10 w-10 text-sm" />
+            <Link href={buildProfileHref(comment.author.id)} className="shrink-0">
+              <Avatar name={`${comment.author.firstName} ${comment.author.lastName}`} className="h-10 w-10 text-sm" />
+            </Link>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-semibold text-ink">
+                <Link
+                  href={buildProfileHref(comment.author.id)}
+                  className="text-sm font-semibold text-ink transition hover:text-accent"
+                >
                   {comment.author.firstName} {comment.author.lastName}
-                </p>
+                </Link>
                 <span className="text-xs text-muted">{formatRelativeTime(comment.createdAt)}</span>
               </div>
               <p className="mt-2 text-sm leading-6 text-muted">{comment.content}</p>

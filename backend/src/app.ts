@@ -10,6 +10,7 @@ import authRoutes from "@/routes/auth";
 import commentsRoutes from "@/routes/comments";
 import postsRoutes from "@/routes/posts";
 import repliesRoutes from "@/routes/replies";
+import usersRoutes from "@/routes/users";
 
 const app = new Hono<AppEnv>();
 
@@ -47,6 +48,7 @@ app.route("/auth", authRoutes);
 app.route("/posts", postsRoutes);
 app.route("/comments", commentsRoutes);
 app.route("/replies", repliesRoutes);
+app.route("/users", usersRoutes);
 
 app.notFound((c) => jsonError(c, 404, "Route not found."));
 

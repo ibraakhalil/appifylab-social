@@ -1,9 +1,16 @@
-import { and, asc, desc, eq, lt, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 import { db } from "@/db/client";
 import { comments, likes, posts, replies, users } from "@/db/schama";
 import { badRequest, forbidden, notFound } from "@/lib/errors";
+import {
+  buildFeedCursorFilter,
+  decodeFeedCursor,
+  encodeFeedCursor,
+  mapFeedPostRow,
+  selectFeedPostColumns,
+} from "@/lib/feed-posts";
 import { sanitizeText } from "@/lib/security";
 import { storePostImage } from "@/lib/uploads";
 import {
@@ -15,11 +22,6 @@ import {
 } from "@/lib/validators";
 import { authMiddleware } from "@/middlewares/auth";
 import type { AppEnv } from "@/types/app";
-
-type FeedCursor = {
-  createdAt: string;
-  id: string;
-};
 
 type CommentNode = {
   author: {
@@ -49,28 +51,6 @@ type ReplyNode = {
   id: string;
   isLiked: boolean;
   likeCount: number;
-};
-
-const encodeCursor = (cursor: FeedCursor) =>
-  Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
-
-const decodeCursor = (cursor: string): FeedCursor => {
-  try {
-    const parsed = JSON.parse(
-      Buffer.from(cursor, "base64url").toString("utf8"),
-    ) as Partial<FeedCursor>;
-
-    if (typeof parsed.createdAt !== "string" || typeof parsed.id !== "string") {
-      throw new Error("Invalid cursor.");
-    }
-
-    return {
-      createdAt: parsed.createdAt,
-      id: parsed.id,
-    };
-  } catch {
-    throw badRequest("Invalid cursor.");
-  }
 };
 
 const buildVisibilityFilter = (userId: string) =>
@@ -104,51 +84,11 @@ postsRoutes.use("*", authMiddleware);
 postsRoutes.get("/", queryValidator(postFeedQuerySchema), async (c) => {
   const authUser = c.get("authUser");
   const { cursor, limit } = c.req.valid("query");
-  const decodedCursor = cursor ? decodeCursor(cursor) : null;
-  const cursorFilter = decodedCursor
-    ? or(
-        lt(posts.createdAt, decodedCursor.createdAt),
-        and(eq(posts.createdAt, decodedCursor.createdAt), lt(posts.id, decodedCursor.id)),
-      )
-    : undefined;
+  const decodedCursor = cursor ? decodeFeedCursor(cursor) : null;
+  const cursorFilter = buildFeedCursorFilter(decodedCursor);
 
   const rows = await db
-    .select({
-      authorEmail: users.email,
-      authorFirstName: users.firstName,
-      authorId: users.id,
-      authorLastName: users.lastName,
-      commentCount: sql<number>`(
-        (
-          select count(*)
-          from ${comments}
-          where ${comments.postId} = ${posts.id}
-        ) + (
-          select count(*)
-          from ${replies}
-          inner join ${comments} on ${comments.id} = ${replies.commentId}
-          where ${comments.postId} = ${posts.id}
-        )
-      )`.mapWith(Number),
-      contentText: posts.contentText,
-      createdAt: posts.createdAt,
-      id: posts.id,
-      imageUrl: posts.imageUrl,
-      isLiked: sql<number>`exists(
-        select 1
-        from ${likes}
-        where ${likes.targetId} = ${posts.id}
-          and ${likes.targetType} = 'post'
-          and ${likes.userId} = ${authUser.userId}
-      )`.mapWith(Number),
-      likeCount: sql<number>`(
-        select count(*)
-        from ${likes}
-        where ${likes.targetId} = ${posts.id}
-          and ${likes.targetType} = 'post'
-      )`.mapWith(Number),
-      visibility: posts.visibility,
-    })
+    .select(selectFeedPostColumns(authUser.userId))
     .from(posts)
     .innerJoin(users, eq(users.id, posts.authorId))
     .where(
@@ -160,22 +100,7 @@ postsRoutes.get("/", queryValidator(postFeedQuerySchema), async (c) => {
     .limit(limit + 1);
 
   const hasMore = rows.length > limit;
-  const items = rows.slice(0, limit).map((row) => ({
-    author: {
-      email: row.authorEmail,
-      firstName: row.authorFirstName,
-      id: row.authorId,
-      lastName: row.authorLastName,
-    },
-    commentCount: row.commentCount,
-    contentText: row.contentText,
-    createdAt: row.createdAt,
-    id: row.id,
-    imageUrl: row.imageUrl,
-    isLiked: Boolean(row.isLiked),
-    likeCount: row.likeCount,
-    visibility: row.visibility,
-  }));
+  const items = rows.slice(0, limit).map(mapFeedPostRow);
 
   const lastItem = items.at(-1);
 
@@ -183,7 +108,7 @@ postsRoutes.get("/", queryValidator(postFeedQuerySchema), async (c) => {
     items,
     nextCursor:
       hasMore && lastItem
-        ? encodeCursor({
+        ? encodeFeedCursor({
             createdAt: lastItem.createdAt,
             id: lastItem.id,
           })

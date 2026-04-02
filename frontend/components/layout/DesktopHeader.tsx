@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Bell, ChevronDown, House, LogOut, Search, UsersRound } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Bell, House, LogOut, Search, UserRound, UsersRound } from "lucide-react";
 
 import Avatar from "@/components/ui/Avatar";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function DesktopHeader() {
+  const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout, user } = useAuth();
 
@@ -41,11 +42,26 @@ export default function DesktopHeader() {
 
         <nav className="ml-auto flex items-center gap-2">
           <Link
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent transition hover:bg-accent hover:text-white"
+            className={`flex h-11 w-11 items-center justify-center rounded-2xl transition ${
+              pathname === "/"
+                ? "bg-accent/10 text-accent"
+                : "text-muted hover:bg-surface-muted hover:text-accent"
+            }`}
             href="/"
             aria-label="Home"
           >
             <House className="h-5 w-5" />
+          </Link>
+          <Link
+            className={`flex h-11 w-11 items-center justify-center rounded-2xl transition ${
+              pathname === "/profile"
+                ? "bg-accent/10 text-accent"
+                : "text-muted hover:bg-surface-muted hover:text-accent"
+            }`}
+            href="/profile"
+            aria-label="Profile"
+          >
+            <UserRound className="h-5 w-5" />
           </Link>
           <Link
             className="flex h-11 w-11 items-center justify-center rounded-2xl text-muted transition hover:bg-surface-muted hover:text-accent"
@@ -67,21 +83,28 @@ export default function DesktopHeader() {
         </nav>
 
         {isAuthenticated && user ? (
-          <button
-            className="flex items-center gap-3 rounded-full border border-line bg-white px-2.5 py-1.5 shadow-sm transition hover:border-accent/40 hover:shadow-[0_12px_30px_rgba(17,32,50,0.08)]"
-            type="button"
-            onClick={handleLogout}
-          >
-            <Avatar name={`${user.firstName} ${user.lastName}`} className="h-10 w-10 text-sm" />
-            <div className="hidden text-left xl:block">
-              <p className="text-sm font-semibold text-ink">
-                {user.firstName} {user.lastName}
-              </p>
-              <p className="text-xs text-muted">{user.email}</p>
-            </div>
-            <LogOut className="h-4 w-4 text-subtle" />
-            <ChevronDown className="h-4 w-4 text-subtle" />
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/profile"
+              className="flex items-center gap-3 rounded-full border border-line bg-white px-2.5 py-1.5 shadow-sm transition hover:border-accent/40 hover:shadow-[0_12px_30px_rgba(17,32,50,0.08)]"
+            >
+              <Avatar name={`${user.firstName} ${user.lastName}`} className="h-10 w-10 text-sm" />
+              <div className="hidden text-left xl:block">
+                <p className="text-sm font-semibold text-ink">
+                  {user.firstName} {user.lastName}
+                </p>
+                <p className="text-xs text-muted">{user.email}</p>
+              </div>
+            </Link>
+            <button
+              className="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-white text-muted shadow-sm transition hover:border-accent/40 hover:text-accent"
+              type="button"
+              onClick={handleLogout}
+              aria-label="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         ) : (
           <Link
             href="/login"
