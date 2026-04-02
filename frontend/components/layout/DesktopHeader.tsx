@@ -1,14 +1,22 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Bell, House, LogOut, Search, UserRound, UsersRound } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Bell, ChevronDown, Home, LogOut, Search, UserRound } from "lucide-react";
 
 import Avatar from "@/components/ui/Avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function DesktopHeader() {
-  const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout, user } = useAuth();
 
@@ -17,17 +25,25 @@ export default function DesktopHeader() {
     router.replace("/login");
   };
 
+
   return (
     <header
       className="sticky top-0 z-50 hidden border-b border-line/70 bg-white/90 backdrop-blur lg:block"
       style={{ height: "var(--header-height)" }}
     >
       <div
-        className="mx-auto flex max-w-[1440px] items-center gap-5 px-6 xl:px-8"
+        className="mx-auto flex justify-between max-w-[1440px] items-center gap-5 px-6 xl:px-8"
         style={{ minHeight: "var(--header-height)" }}
       >
-        <Link href="/" className="shrink-0 text-lg font-semibold text-ink">
-          Buddy Script
+        <Link href="/" className="shrink-0" aria-label="Buddy Script home">
+          <Image
+            src="/svgs/logo.svg"
+            alt="Buddy Script"
+            width={144}
+            height={36}
+            className="h-9 w-auto"
+            priority
+          />
         </Link>
 
         <form className="relative hidden max-w-md flex-1 lg:block">
@@ -39,39 +55,10 @@ export default function DesktopHeader() {
             aria-label="Search"
           />
         </form>
-
-        <nav className="ml-auto flex items-center gap-2">
-          <Link
-            className={`flex h-11 w-11 items-center justify-center rounded-2xl transition ${
-              pathname === "/"
-                ? "bg-accent/10 text-accent"
-                : "text-muted hover:bg-surface-muted hover:text-accent"
-            }`}
-            href="/"
-            aria-label="Home"
-          >
-            <House className="h-5 w-5" />
-          </Link>
-          <Link
-            className={`flex h-11 w-11 items-center justify-center rounded-2xl transition ${
-              pathname === "/profile"
-                ? "bg-accent/10 text-accent"
-                : "text-muted hover:bg-surface-muted hover:text-accent"
-            }`}
-            href="/profile"
-            aria-label="Profile"
-          >
-            <UserRound className="h-5 w-5" />
-          </Link>
-          <Link
-            className="flex h-11 w-11 items-center justify-center rounded-2xl text-muted transition hover:bg-surface-muted hover:text-accent"
-            href="#"
-            aria-label="Friend requests"
-          >
-            <UsersRound className="h-5 w-5" />
-          </Link>
+    <div className="flex items-center gap-4">
+        <nav className="ml-auto ">
           <button
-            className="relative flex h-11 w-11 items-center justify-center rounded-2xl text-muted transition hover:bg-surface-muted hover:text-accent"
+            className="relative bg-gray-100 rounded-full flex h-11 w-11 items-center justify-center  text-muted transition hover:text-accent"
             type="button"
             aria-label="Notifications"
           >
@@ -83,28 +70,54 @@ export default function DesktopHeader() {
         </nav>
 
         {isAuthenticated && user ? (
-          <div className="flex items-center gap-2">
-            <Link
-              href="/profile"
-              className="flex items-center gap-3 rounded-full border border-line bg-white px-2.5 py-1.5 shadow-sm transition hover:border-accent/40 hover:shadow-[0_12px_30px_rgba(17,32,50,0.08)]"
-            >
-              <Avatar name={`${user.firstName} ${user.lastName}`} className="h-10 w-10 text-sm" />
-              <div className="hidden text-left xl:block">
-                <p className="text-sm font-semibold text-ink">
-                  {user.firstName} {user.lastName}
-                </p>
-                <p className="text-xs text-muted">{user.email}</p>
-              </div>
-            </Link>
-            <button
-              className="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-white text-muted shadow-sm transition hover:border-accent/40 hover:text-accent"
-              type="button"
-              onClick={handleLogout}
-              aria-label="Logout"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="relative flex h-11 w-11 items-center justify-center rounded-full transition hover:opacity-90"
+                type="button"
+                aria-label="Open menu"
+              >
+                <Avatar name={`${user.firstName} ${user.lastName}`} className="h-11 w-11 text-sm" />
+                <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-white text-subtle shadow-sm">
+                  <ChevronDown className="h-3 w-3" />
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 p-2">
+              <DropdownMenuLabel className="px-3 py-3">
+                <div className="flex items-center gap-3 normal-case tracking-normal">
+                  <Avatar name={`${user.firstName} ${user.lastName}`} className="h-10 w-10 text-sm" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-ink">
+                      {user.firstName} {user.lastName}
+                    </p>
+                    <p className="truncate text-xs font-medium text-muted">{user.email}</p>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/" className="flex items-center gap-3">
+                  <Home className="h-4 w-4 text-muted" />
+                  Home
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/profile" className="flex items-center gap-3">
+                  <UserRound className="h-4 w-4 text-muted" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="flex items-center gap-3 text-red-600 focus:bg-red-50 focus:text-red-700"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <Link
             href="/login"
@@ -112,7 +125,8 @@ export default function DesktopHeader() {
           >
             Login
           </Link>
-        )}
+        )}</div>
+
       </div>
     </header>
   );
