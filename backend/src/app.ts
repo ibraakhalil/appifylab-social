@@ -9,6 +9,7 @@ import { jsonError } from "@/lib/http";
 import authRoutes from "@/routes/auth";
 import commentsRoutes from "@/routes/comments";
 import postsRoutes from "@/routes/posts";
+import repliesRoutes from "@/routes/replies";
 
 const app = new Hono<AppEnv>();
 
@@ -45,6 +46,7 @@ app.get("/health", (c) =>
 app.route("/auth", authRoutes);
 app.route("/posts", postsRoutes);
 app.route("/comments", commentsRoutes);
+app.route("/replies", repliesRoutes);
 
 app.notFound((c) => jsonError(c, 404, "Route not found."));
 

@@ -28,8 +28,9 @@ type FeedPostCardProps = {
   onCommentLikeToggle: (commentId: string) => Promise<void>;
   onCommentSubmit: () => Promise<void>;
   onLike: () => void;
+  onReplyLikeToggle: (replyId: string) => Promise<void>;
   onReplyDraftChange: (commentId: string, value: string) => void;
-  onReplySubmit: (parentId: string) => Promise<void>;
+  onReplySubmit: (commentId: string) => Promise<void>;
   onToggleComments: () => void;
   post: FeedPost;
   replyDrafts: Record<string, string>;
@@ -46,6 +47,7 @@ export default function FeedPostCard({
   onCommentLikeToggle,
   onCommentSubmit,
   onLike,
+  onReplyLikeToggle,
   onReplyDraftChange,
   onReplySubmit,
   onToggleComments,
@@ -173,6 +175,7 @@ export default function FeedPostCard({
                   activeReplyId={activeReplyId}
                   comment={comment}
                   onReplyChange={onReplyDraftChange}
+                  onReplyLikeToggle={onReplyLikeToggle}
                   onReplySubmit={onReplySubmit}
                   onToggleLike={onCommentLikeToggle}
                   replyDrafts={replyDrafts}

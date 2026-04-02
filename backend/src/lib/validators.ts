@@ -43,7 +43,10 @@ export const postFeedQuerySchema = z.object({
 
 export const createCommentSchema = z.object({
   content: z.string().min(1).max(1000),
-  parentId: z.string().uuid().optional(),
+});
+
+export const createReplySchema = z.object({
+  content: z.string().min(1).max(1000),
 });
 
 export const jsonValidator = <T extends z.ZodType>(schema: T) =>

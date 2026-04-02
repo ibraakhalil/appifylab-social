@@ -17,7 +17,7 @@ export const likes = sqliteTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     targetId: text("target_id").notNull(),
-    targetType: text("target_type", { enum: ["post", "comment"] }).notNull(),
+    targetType: text("target_type", { enum: ["post", "comment", "reply"] }).notNull(),
     createdAt: text("created_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
@@ -32,7 +32,7 @@ export const likes = sqliteTable(
     index("likes_user_id_idx").on(table.userId),
     check(
       "likes_target_type_check",
-      sql`${table.targetType} in ('post', 'comment')`,
+      sql`${table.targetType} in ('post', 'comment', 'reply')`,
     ),
   ],
 );

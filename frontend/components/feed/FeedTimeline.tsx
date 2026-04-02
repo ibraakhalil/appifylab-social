@@ -5,16 +5,18 @@ import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import {
   createComment,
+  createReply,
   getComments,
   getFeed,
   toggleCommentLike,
   togglePostLike,
+  toggleReplyLike,
 } from "@/lib/api/posts";
 import type { CommentItem, FeedPost } from "@/lib/api/types";
 
 import FeedLoadingState from "./FeedLoadingState";
 import FeedPostCard from "./FeedPostCard";
-import { updateCommentLikeState } from "./feedUtils";
+import { updateCommentLikeState, updateReplyLikeState } from "./feedUtils";
 
 type PostCommentsState = Record<string, CommentItem[]>;
 
@@ -150,8 +152,8 @@ export default function FeedTimeline({
     }
   };
 
-  const handleCommentSubmit = async (postId: string, parentId?: string) => {
-    const value = parentId ? replyDrafts[parentId] ?? "" : commentDrafts[postId] ?? "";
+  const handleCommentSubmit = async (postId: string) => {
+    const value = commentDrafts[postId] ?? "";
 
     if (!value.trim()) {
       return;
@@ -160,21 +162,12 @@ export default function FeedTimeline({
     try {
       await createComment(postId, {
         content: value.trim(),
-        parentId,
       });
 
-      if (parentId) {
-        setReplyDrafts((current) => ({
-          ...current,
-          [parentId]: "",
-        }));
-        setActiveReplyId(null);
-      } else {
-        setCommentDrafts((current) => ({
-          ...current,
-          [postId]: "",
-        }));
-      }
+      setCommentDrafts((current) => ({
+        ...current,
+        [postId]: "",
+      }));
 
       await loadCommentsForPost(postId);
       setPosts((current) =>
@@ -199,6 +192,47 @@ export default function FeedTimeline({
     }
   };
 
+  const handleReplySubmit = async (postId: string, commentId: string) => {
+    const value = replyDrafts[commentId] ?? "";
+
+    if (!value.trim()) {
+      return;
+    }
+
+    try {
+      await createReply(commentId, {
+        content: value.trim(),
+      });
+
+      setReplyDrafts((current) => ({
+        ...current,
+        [commentId]: "",
+      }));
+      setActiveReplyId(null);
+
+      await loadCommentsForPost(postId);
+      setPosts((current) =>
+        current.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                commentCount: post.commentCount + 1,
+              }
+            : post,
+        ),
+      );
+    } catch (submissionError) {
+      if (submissionError instanceof ApiError && submissionError.status === 401) {
+        onUnauthorized();
+        return;
+      }
+
+      setError(
+        submissionError instanceof Error ? submissionError.message : "Unable to add reply.",
+      );
+    }
+  };
+
   const handleToggleCommentLike = async (postId: string, commentId: string) => {
     try {
       const response = await toggleCommentLike(commentId);
@@ -213,6 +247,23 @@ export default function FeedTimeline({
       }
 
       setError(toggleError instanceof Error ? toggleError.message : "Unable to update comment like.");
+    }
+  };
+
+  const handleToggleReplyLike = async (postId: string, replyId: string) => {
+    try {
+      const response = await toggleReplyLike(replyId);
+      setCommentsByPostId((current) => ({
+        ...current,
+        [postId]: updateReplyLikeState(current[postId] ?? [], replyId, response),
+      }));
+    } catch (toggleError) {
+      if (toggleError instanceof ApiError && toggleError.status === 401) {
+        onUnauthorized();
+        return;
+      }
+
+      setError(toggleError instanceof Error ? toggleError.message : "Unable to update reply like.");
     }
   };
 
@@ -248,6 +299,7 @@ export default function FeedTimeline({
           onCommentLikeToggle={(commentId) => handleToggleCommentLike(post.id, commentId)}
           onCommentSubmit={() => handleCommentSubmit(post.id)}
           onLike={() => void handleTogglePostLike(post.id)}
+          onReplyLikeToggle={(replyId) => handleToggleReplyLike(post.id, replyId)}
           onReplyDraftChange={(commentId, value) => {
             setActiveReplyId(commentId);
             setReplyDrafts((current) => ({
@@ -255,7 +307,7 @@ export default function FeedTimeline({
               [commentId]: value,
             }));
           }}
-          onReplySubmit={(parentId) => handleCommentSubmit(post.id, parentId)}
+          onReplySubmit={(commentId) => handleReplySubmit(post.id, commentId)}
           onToggleComments={() => void handleToggleComments(post.id)}
           post={post}
           replyDrafts={replyDrafts}

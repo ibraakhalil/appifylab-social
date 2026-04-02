@@ -40,12 +40,23 @@ export const updateCommentLikeState = (
       };
     }
 
-    if (!item.replies.length) {
-      return item;
-    }
-
-    return {
-      ...item,
-      replies: updateCommentLikeState(item.replies, commentId, nextState),
-    };
+    return item;
   });
+
+export const updateReplyLikeState = (
+  items: CommentItem[],
+  replyId: string,
+  nextState: { isLiked: boolean; likeCount: number },
+): CommentItem[] =>
+  items.map((item) => ({
+    ...item,
+    replies: item.replies.map((reply) =>
+      reply.id === replyId
+        ? {
+            ...reply,
+            isLiked: nextState.isLiked,
+            likeCount: nextState.likeCount,
+          }
+        : reply,
+    ),
+  }));

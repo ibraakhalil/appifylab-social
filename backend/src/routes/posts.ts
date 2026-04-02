@@ -2,7 +2,7 @@ import { and, asc, desc, eq, lt, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 import { db } from "@/db/client";
-import { comments, likes, posts, users } from "@/db/schama";
+import { comments, likes, posts, replies, users } from "@/db/schama";
 import { badRequest, forbidden, notFound } from "@/lib/errors";
 import { sanitizeText } from "@/lib/security";
 import { storePostImage } from "@/lib/uploads";
@@ -33,8 +33,22 @@ type CommentNode = {
   id: string;
   isLiked: boolean;
   likeCount: number;
-  parentId: string | null;
-  replies: CommentNode[];
+  replies: ReplyNode[];
+};
+
+type ReplyNode = {
+  author: {
+    email: string;
+    firstName: string;
+    id: string;
+    lastName: string;
+  };
+  commentId: string;
+  content: string;
+  createdAt: string;
+  id: string;
+  isLiked: boolean;
+  likeCount: number;
 };
 
 const encodeCursor = (cursor: FeedCursor) =>
@@ -83,35 +97,6 @@ const getVisiblePost = async (postId: string, userId: string) => {
   return post;
 };
 
-const buildCommentTree = (rows: Omit<CommentNode, "replies">[]) => {
-  const byId = new Map<string, CommentNode>();
-  const roots: CommentNode[] = [];
-
-  for (const row of rows) {
-    byId.set(row.id, {
-      ...row,
-      replies: [],
-    });
-  }
-
-  for (const row of byId.values()) {
-    if (!row.parentId) {
-      roots.push(row);
-      continue;
-    }
-
-    const parent = byId.get(row.parentId);
-
-    if (parent) {
-      parent.replies.push(row);
-    } else {
-      roots.push(row);
-    }
-  }
-
-  return roots;
-};
-
 const postsRoutes = new Hono<AppEnv>();
 
 postsRoutes.use("*", authMiddleware);
@@ -134,9 +119,16 @@ postsRoutes.get("/", queryValidator(postFeedQuerySchema), async (c) => {
       authorId: users.id,
       authorLastName: users.lastName,
       commentCount: sql<number>`(
-        select count(*)
-        from ${comments}
-        where ${comments.postId} = ${posts.id}
+        (
+          select count(*)
+          from ${comments}
+          where ${comments.postId} = ${posts.id}
+        ) + (
+          select count(*)
+          from ${replies}
+          inner join ${comments} on ${comments.id} = ${replies.commentId}
+          where ${comments.postId} = ${posts.id}
+        )
       )`.mapWith(Number),
       contentText: posts.contentText,
       createdAt: posts.createdAt,
@@ -364,7 +356,7 @@ postsRoutes.get("/:id/comments", async (c) => {
 
   await getVisiblePost(postId, authUser.userId);
 
-  const rows = await db
+  const commentRows = await db
     .select({
       authorEmail: users.email,
       authorFirstName: users.firstName,
@@ -386,29 +378,79 @@ postsRoutes.get("/:id/comments", async (c) => {
         where ${likes.targetId} = ${comments.id}
           and ${likes.targetType} = 'comment'
       )`.mapWith(Number),
-      parentId: comments.parentId,
     })
     .from(comments)
     .innerJoin(users, eq(users.id, comments.authorId))
     .where(eq(comments.postId, postId))
     .orderBy(asc(comments.createdAt), asc(comments.id));
 
-  const items = buildCommentTree(
-    rows.map((row) => ({
+  const replyRows = await db
+    .select({
+      authorEmail: users.email,
+      authorFirstName: users.firstName,
+      authorId: users.id,
+      authorLastName: users.lastName,
+      commentId: replies.commentId,
+      content: replies.content,
+      createdAt: replies.createdAt,
+      id: replies.id,
+      isLiked: sql<number>`exists(
+        select 1
+        from ${likes}
+        where ${likes.targetId} = ${replies.id}
+          and ${likes.targetType} = 'reply'
+          and ${likes.userId} = ${authUser.userId}
+      )`.mapWith(Number),
+      likeCount: sql<number>`(
+        select count(*)
+        from ${likes}
+        where ${likes.targetId} = ${replies.id}
+          and ${likes.targetType} = 'reply'
+      )`.mapWith(Number),
+    })
+    .from(replies)
+    .innerJoin(comments, eq(comments.id, replies.commentId))
+    .innerJoin(users, eq(users.id, replies.authorId))
+    .where(eq(comments.postId, postId))
+    .orderBy(asc(replies.createdAt), asc(replies.id));
+
+  const repliesByCommentId = new Map<string, ReplyNode[]>();
+
+  for (const row of replyRows) {
+    const currentReplies = repliesByCommentId.get(row.commentId) ?? [];
+
+    currentReplies.push({
       author: {
         email: row.authorEmail,
         firstName: row.authorFirstName,
         id: row.authorId,
         lastName: row.authorLastName,
       },
+      commentId: row.commentId,
       content: row.content,
       createdAt: row.createdAt,
       id: row.id,
       isLiked: Boolean(row.isLiked),
       likeCount: row.likeCount,
-      parentId: row.parentId,
-    })),
-  );
+    });
+
+    repliesByCommentId.set(row.commentId, currentReplies);
+  }
+
+  const items = commentRows.map((row) => ({
+    author: {
+      email: row.authorEmail,
+      firstName: row.authorFirstName,
+      id: row.authorId,
+      lastName: row.authorLastName,
+    },
+    content: row.content,
+    createdAt: row.createdAt,
+    id: row.id,
+    isLiked: Boolean(row.isLiked),
+    likeCount: row.likeCount,
+    replies: repliesByCommentId.get(row.id) ?? [],
+  }));
 
   return c.json({ items });
 });
@@ -419,20 +461,6 @@ postsRoutes.post("/:id/comments", jsonValidator(createCommentSchema), async (c) 
   const payload = c.req.valid("json");
 
   await getVisiblePost(postId, authUser.userId);
-
-  if (payload.parentId) {
-    const parent = await db.query.comments.findFirst({
-      columns: {
-        id: true,
-        postId: true,
-      },
-      where: eq(comments.id, payload.parentId),
-    });
-
-    if (!parent || parent.postId !== postId) {
-      throw badRequest("parentId must belong to the same post.");
-    }
-  }
 
   const content = sanitizeText(payload.content);
 
@@ -447,16 +475,13 @@ postsRoutes.post("/:id/comments", jsonValidator(createCommentSchema), async (c) 
     content,
     createdAt: new Date().toISOString(),
     id: commentId,
-    parentId: payload.parentId ?? null,
     postId,
   });
 
   return c.json(
     {
       id: commentId,
-      message: payload.parentId
-        ? "Reply created successfully."
-        : "Comment created successfully.",
+      message: "Comment created successfully.",
     },
     201,
   );

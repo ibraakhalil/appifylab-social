@@ -1,5 +1,5 @@
 import Avatar from "@/components/ui/Avatar";
-import type { CommentItem } from "@/lib/api/types";
+import type { CommentItem, ReplyItem } from "@/lib/api/types";
 
 import { formatRelativeTime } from "./feedUtils";
 
@@ -7,15 +7,51 @@ type CommentThreadProps = {
   activeReplyId: string | null;
   comment: CommentItem;
   onReplyChange: (commentId: string, value: string) => void;
-  onReplySubmit: (parentId: string) => Promise<void>;
+  onReplyLikeToggle: (replyId: string) => Promise<void>;
+  onReplySubmit: (commentId: string) => Promise<void>;
   onToggleLike: (commentId: string) => Promise<void>;
   replyDrafts: Record<string, string>;
 };
+
+function ReplyCard({
+  reply,
+  onToggleLike,
+}: {
+  onToggleLike: (replyId: string) => Promise<void>;
+  reply: ReplyItem;
+}) {
+  return (
+    <div className="rounded-3xl bg-white p-4 shadow-sm">
+      <div className="flex items-start gap-3">
+        <Avatar name={`${reply.author.firstName} ${reply.author.lastName}`} className="h-9 w-9 text-sm" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-ink">
+              {reply.author.firstName} {reply.author.lastName}
+            </p>
+            <span className="text-xs text-muted">{formatRelativeTime(reply.createdAt)}</span>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted">{reply.content}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-xs font-medium text-muted">
+            <button
+              type="button"
+              onClick={() => void onToggleLike(reply.id)}
+              className={`transition ${reply.isLiked ? "text-accent" : "hover:text-ink"}`}
+            >
+              Like ({reply.likeCount})
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CommentThread({
   activeReplyId,
   comment,
   onReplyChange,
+  onReplyLikeToggle,
   onReplySubmit,
   onToggleLike,
   replyDrafts,
@@ -79,14 +115,10 @@ export default function CommentThread({
       {comment.replies.length ? (
         <div className="ml-6 space-y-3 border-l border-line pl-4">
           {comment.replies.map((reply) => (
-            <CommentThread
+            <ReplyCard
               key={reply.id}
-              activeReplyId={activeReplyId}
-              comment={reply}
-              onReplyChange={onReplyChange}
-              onReplySubmit={onReplySubmit}
-              onToggleLike={onToggleLike}
-              replyDrafts={replyDrafts}
+              reply={reply}
+              onToggleLike={onReplyLikeToggle}
             />
           ))}
         </div>

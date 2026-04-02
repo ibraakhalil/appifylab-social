@@ -2,8 +2,10 @@ import { and, asc, eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 import { db } from "@/db/client";
-import { comments, likes, posts, users } from "@/db/schama";
-import { forbidden, notFound } from "@/lib/errors";
+import { comments, likes, posts, replies, users } from "@/db/schama";
+import { badRequest, forbidden, notFound } from "@/lib/errors";
+import { sanitizeText } from "@/lib/security";
+import { createReplySchema, jsonValidator } from "@/lib/validators";
 import { authMiddleware } from "@/middlewares/auth";
 import type { AppEnv } from "@/types/app";
 
@@ -52,6 +54,38 @@ commentsRoutes.get("/:id/likes", async (c) => {
     .orderBy(asc(users.firstName), asc(users.lastName));
 
   return c.json({ items });
+});
+
+commentsRoutes.post("/:id/replies", jsonValidator(createReplySchema), async (c) => {
+  const authUser = c.get("authUser");
+  const commentId = c.req.param("id");
+  const payload = c.req.valid("json");
+
+  await getVisibleComment(commentId, authUser.userId);
+
+  const content = sanitizeText(payload.content);
+
+  if (!content) {
+    throw badRequest("Reply content cannot be empty.");
+  }
+
+  const replyId = crypto.randomUUID();
+
+  await db.insert(replies).values({
+    authorId: authUser.userId,
+    commentId,
+    content,
+    createdAt: new Date().toISOString(),
+    id: replyId,
+  });
+
+  return c.json(
+    {
+      id: replyId,
+      message: "Reply created successfully.",
+    },
+    201,
+  );
 });
 
 commentsRoutes.post("/:id/like", async (c) => {

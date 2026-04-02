@@ -38,8 +38,17 @@ export type CommentItem = {
   id: string;
   isLiked: boolean;
   likeCount: number;
-  parentId: string | null;
-  replies: CommentItem[];
+  replies: ReplyItem[];
+};
+
+export type ReplyItem = {
+  author: ApiUser;
+  commentId: string;
+  content: string;
+  createdAt: string;
+  id: string;
+  isLiked: boolean;
+  likeCount: number;
 };
 
 export type CommentsResponse = {

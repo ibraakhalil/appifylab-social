@@ -7,7 +7,10 @@ export type CreatePostInput = {
 
 export type CreateCommentInput = {
   content: string;
-  parentId?: string;
+};
+
+export type CreateReplyInput = {
+  content: string;
 };
 
 export const getFeed = (cursor?: string | null) =>
@@ -35,5 +38,16 @@ export const createComment = (postId: string, input: CreateCommentInput) =>
 
 export const toggleCommentLike = (commentId: string) =>
   apiFetch<{ isLiked: boolean; likeCount: number }>(`/comments/${commentId}/like`, {
+    method: "POST",
+  });
+
+export const createReply = (commentId: string, input: CreateReplyInput) =>
+  apiFetch<{ id: string; message: string }>(`/comments/${commentId}/replies`, {
+    body: JSON.stringify(input),
+    method: "POST",
+  });
+
+export const toggleReplyLike = (replyId: string) =>
+  apiFetch<{ isLiked: boolean; likeCount: number }>(`/replies/${replyId}/like`, {
     method: "POST",
   });
