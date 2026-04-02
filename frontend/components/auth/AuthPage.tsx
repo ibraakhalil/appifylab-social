@@ -175,12 +175,12 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
       <div className="relative mx-auto grid min-h-screen max-w-[1440px] items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_28rem] lg:px-8 lg:py-16">
         <section className="relative hidden lg:block">
-          <div className="relative mx-auto max-w-[760px] ">
+          <div className="relative mx-auto max-w-[660px] ">
             <div className="relative mt-10">
               <Image
                 src={content.heroImage}
-                width={820}
-                height={620}
+                width={620}
+                height={420}
                 alt={content.heroAlt}
                 className="h-auto w-full"
                 priority
@@ -205,24 +205,12 @@ export default function AuthPage({ mode }: AuthPageProps) {
         <section className="mx-auto w-full max-w-[448px]">
           <div className="rounded-[32px] border border-white/70 bg-white p-6 shadow-[0_24px_60px_rgba(17,32,50,0.12)] sm:p-8">
 
-            <div className="text-center">
-              <h2 className="mt-2 text-[28px] font-semibold leading-tight text-ink">{content.title}</h2>
+            <div className="text-center mb-10">
+              <h2 className=" text-[28px] font-semibold leading-tight text-ink">{content.title}</h2>
+              <p className="mt-2 text-sm text-muted">Join Buddy Script and connect with your friends</p>
             </div>
 
-            <button
-              type="button"
-              disabled
-              className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-line bg-surface-muted text-sm font-medium text-ink opacity-70"
-            >
-              <Sparkles className="h-4 w-4 text-accent" />
-              {isRegistration ? "Register with Google" : "Sign in with Google"} (Soon)
-            </button>
 
-            <div className="my-8 flex items-center gap-4">
-              <span className="h-px flex-1 bg-line" />
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-subtle">Or</span>
-              <span className="h-px flex-1 bg-line" />
-            </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               {isRegistration ? (

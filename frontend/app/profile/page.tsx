@@ -9,7 +9,7 @@ export default function ProfilePage() {
         <div className="hidden lg:block">
           <LeftSidebar />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 max-w-4xl">
           <ProfileContainer />
         </div>
       </div>
