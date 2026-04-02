@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/providers/AuthProvider";
 
@@ -7,6 +7,11 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["100", "300", "400", "500", "600", "700", "800"],
+});
+
+const hindSiliguri = Hind_Siliguri({
+  variable: "--font-hind-siliguri",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -20,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
+    <html lang="en" className={`${poppins.variable} ${hindSiliguri.variable} h-full antialiased`}>
       <body className="min-h-full bg-page text-ink">
         <AuthProvider>{children}</AuthProvider>
       </body>

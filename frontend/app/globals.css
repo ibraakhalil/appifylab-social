@@ -38,7 +38,7 @@ body {
   margin: 0;
   background: var(--page);
   color: var(--ink);
-  font-family: var(--font-poppins), sans-serif;
+  font-family: var(--font-poppins), var(--font-hind-siliguri), sans-serif;
 }
 
 *,
