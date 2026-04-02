@@ -69,16 +69,49 @@ export const posts = [
     reactions: "9+",
     commentsCount: 12,
     sharesCount: 122,
-  }
+  },
 ];
 
 export const friends = [
-  { id: 1, name: "Steve Jobs", role: "CEO of Apple", image: "/images/people1.png", time: "5 minute ago", active: false },
-  { id: 2, name: "Ryan Roslansky", role: "CEO of Linkedin", image: "/images/people2.png", active: true },
+  {
+    id: 1,
+    name: "Steve Jobs",
+    role: "CEO of Apple",
+    image: "/images/people1.png",
+    time: "5 minute ago",
+    active: false,
+  },
+  {
+    id: 2,
+    name: "Ryan Roslansky",
+    role: "CEO of Linkedin",
+    image: "/images/people2.png",
+    active: true,
+  },
   { id: 3, name: "Dylan Field", role: "CEO of Figma", image: "/images/people3.png", active: true },
-  { id: 4, name: "Steve Jobs", role: "CEO of Apple", image: "/images/people1.png", time: "5 minute ago", active: false },
-  { id: 5, name: "Ryan Roslansky", role: "CEO of Linkedin", image: "/images/people2.png", active: true },
+  {
+    id: 4,
+    name: "Steve Jobs",
+    role: "CEO of Apple",
+    image: "/images/people1.png",
+    time: "5 minute ago",
+    active: false,
+  },
+  {
+    id: 5,
+    name: "Ryan Roslansky",
+    role: "CEO of Linkedin",
+    image: "/images/people2.png",
+    active: true,
+  },
   { id: 6, name: "Dylan Field", role: "CEO of Figma", image: "/images/people3.png", active: true },
   { id: 7, name: "Dylan Field", role: "CEO of Figma", image: "/images/people3.png", active: true },
-  { id: 8, name: "Steve Jobs", role: "CEO of Apple", image: "/images/people1.png", time: "5 minute ago", active: false },
+  {
+    id: 8,
+    name: "Steve Jobs",
+    role: "CEO of Apple",
+    image: "/images/people1.png",
+    time: "5 minute ago",
+    active: false,
+  },
 ];

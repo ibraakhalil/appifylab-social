@@ -47,7 +47,7 @@ const DialogContent = React.forwardRef<
     >
       {children}
       <DialogPrimitive.Close
-        className="absolute right-4 top-4 rounded-full p-2 text-muted transition hover:bg-surface-muted hover:text-ink focus:outline-none"
+        className="text-muted hover:bg-surface-muted hover:text-ink absolute right-4 top-4 rounded-full p-2 transition focus:outline-none"
         aria-label="Close"
       >
         <X className="h-4 w-4" />
@@ -57,10 +57,7 @@ const DialogContent = React.forwardRef<
 ));
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-function DialogHeader({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("flex flex-col gap-1 text-left", className)} {...props} />;
 }
 
@@ -69,10 +66,7 @@ function DialogTitle({
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
   return (
-    <DialogPrimitive.Title
-      className={cn("text-lg font-semibold text-ink", className)}
-      {...props}
-    />
+    <DialogPrimitive.Title className={cn("text-ink text-lg font-semibold", className)} {...props} />
   );
 }
 
@@ -82,7 +76,7 @@ function DialogDescription({
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn("text-sm leading-6 text-muted", className)}
+      className={cn("text-muted text-sm leading-6", className)}
       {...props}
     />
   );

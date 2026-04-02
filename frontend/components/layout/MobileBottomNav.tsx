@@ -12,8 +12,8 @@ export default function MobileBottomNav() {
   const { user } = useAuth();
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-line/70 bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
-      <div className="mx-auto flex max-w-md items-center justify-between rounded-full bg-ink px-4 py-2 text-white shadow-[0_-12px_35px_rgba(17,32,50,0.18)]">
+    <div className="border-line/70 fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+      <div className="bg-ink mx-auto flex max-w-md items-center justify-between rounded-full px-4 py-2 text-white shadow-[0_-12px_35px_rgba(17,32,50,0.18)]">
         <Link
           className={`flex min-w-16 flex-col items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium transition ${
             pathname === "/" ? "text-white" : "text-white/70 hover:text-white"
@@ -36,7 +36,7 @@ export default function MobileBottomNav() {
         >
           <Bell className="h-5 w-5" />
           Alerts
-          <span className="absolute right-3 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+          <span className="bg-accent absolute right-3 top-0 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white">
             6
           </span>
         </button>

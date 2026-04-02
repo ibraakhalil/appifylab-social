@@ -84,9 +84,7 @@ export default function ProfileContent({
     {
       label: "Replies and comments",
       value: formatCountLabel(profile.stats.totalCommentCount, "response"),
-      hint: profile.isCurrentUser
-        ? "Across all of your posts"
-        : "Across visible posts",
+      hint: profile.isCurrentUser ? "Across all of your posts" : "Across visible posts",
     },
   ];
 
@@ -98,46 +96,46 @@ export default function ProfileContent({
         </div>
       ) : null}
 
-      <section className="rounded-3xl border border-line/70 bg-white px-5 py-6 shadow-[0_16px_40px_rgba(17,32,50,0.06)] sm:px-6">
+      <section className="border-line/70 rounded-3xl border bg-white px-5 py-6 shadow-[0_16px_40px_rgba(17,32,50,0.06)] sm:px-6">
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-4">
               <Avatar name={currentUserName} className="h-16 w-16 shrink-0 text-xl" />
               <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-subtle">
+                <p className="text-subtle text-xs font-medium uppercase tracking-[0.16em]">
                   {profileLabel}
                 </p>
-                <h1 className="mt-1 text-2xl font-semibold text-ink">
+                <h1 className="text-ink mt-1 text-2xl font-semibold">
                   {profile.user.firstName} {profile.user.lastName}
                 </h1>
-                <div className="mt-3 space-y-2 text-sm text-muted">
+                <div className="text-muted mt-3 space-y-2 text-sm">
                   {profile.isCurrentUser ? (
                     <p className="flex items-center gap-2 break-all">
-                      <Mail className="h-4 w-4 shrink-0 text-subtle" />
+                      <Mail className="text-subtle h-4 w-4 shrink-0" />
                       <span>{profile.user.email}</span>
                     </p>
                   ) : null}
                   <p className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 shrink-0 text-subtle" />
+                    <CalendarDays className="text-subtle h-4 w-4 shrink-0" />
                     <span>Member since {formatMemberSince(profile.user.createdAt)}</span>
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="inline-flex items-center rounded-full border border-line bg-surface-muted px-3 py-1.5 text-sm text-muted">
+            <div className="border-line bg-surface-muted text-muted inline-flex items-center rounded-full border px-3 py-1.5 text-sm">
               {profile.isCurrentUser
                 ? `Signed in as ${sessionUser?.email ?? profile.user.email}`
                 : "Public posts only"}
             </div>
           </div>
 
-          <dl className="grid gap-4 border-t border-line/70 pt-4 sm:grid-cols-2">
+          <dl className="border-line/70 grid gap-4 border-t pt-4 sm:grid-cols-2">
             {stats.map((stat) => (
               <div key={stat.label} className="space-y-1">
-                <dt className="text-sm font-medium text-muted">{stat.label}</dt>
-                <dd className="text-lg font-semibold text-ink">{stat.value}</dd>
-                <p className="text-sm text-subtle">{stat.hint}</p>
+                <dt className="text-muted text-sm font-medium">{stat.label}</dt>
+                <dd className="text-ink text-lg font-semibold">{stat.value}</dd>
+                <p className="text-subtle text-sm">{stat.hint}</p>
               </div>
             ))}
           </dl>

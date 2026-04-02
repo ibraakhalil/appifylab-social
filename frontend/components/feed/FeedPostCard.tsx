@@ -73,18 +73,21 @@ export default function FeedPostCard({
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Link href={buildProfileHref(post.author.id)} className="shrink-0">
-              <Avatar name={`${post.author.firstName} ${post.author.lastName}`} className="h-11 w-11 text-sm" />
+              <Avatar
+                name={`${post.author.firstName} ${post.author.lastName}`}
+                className="h-11 w-11 text-sm"
+              />
             </Link>
             <div className="min-w-0">
               <Link
                 href={buildProfileHref(post.author.id)}
-                className="block text-sm font-semibold text-ink transition hover:text-accent"
+                className="text-ink hover:text-accent block text-sm font-semibold transition"
               >
                 {post.author.firstName} {post.author.lastName}
               </Link>
-              <div className="mt-1 flex items-center gap-2 text-xs text-muted">
+              <div className="text-muted mt-1 flex items-center gap-2 text-xs">
                 <span>{formatRelativeTime(post.createdAt)}</span>
-                <span className="h-1 w-1 rounded-full bg-subtle" />
+                <span className="bg-subtle h-1 w-1 rounded-full" />
                 <span className="inline-flex items-center gap-1">
                   {post.visibility === "public" ? (
                     <Globe2 className="h-3.5 w-3.5" />
@@ -97,7 +100,7 @@ export default function FeedPostCard({
             </div>
           </div>
           <button
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-muted text-muted transition hover:bg-accent/10 hover:text-accent"
+            className="bg-surface-muted text-muted hover:bg-accent/10 hover:text-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition"
             type="button"
             aria-label="More post options"
           >
@@ -106,23 +109,30 @@ export default function FeedPostCard({
         </div>
 
         <div className="mt-4 space-y-4">
-          {post.contentText ? <p className="text-sm leading-7 text-muted">{post.contentText}</p> : null}
+          {post.contentText ? (
+            <p className="text-muted text-sm leading-7">{post.contentText}</p>
+          ) : null}
           {post.imageUrl ? (
-            <div className="overflow-hidden rounded-lg border border-line/70">
-              <img src={post.imageUrl} alt="" className="h-auto w-full object-cover" loading="lazy" />
+            <div className="border-line/70 overflow-hidden rounded-lg border">
+              <img
+                src={post.imageUrl}
+                alt=""
+                className="h-auto w-full object-cover"
+                loading="lazy"
+              />
             </div>
           ) : null}
         </div>
 
-        <div className="mt-4 flex flex-col gap-3 border-b border-line/70 pb-4 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-line/70 text-muted mt-4 flex flex-col gap-3 border-b pb-4 text-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="inline-flex items-center gap-2">
-            <span className="flex size-6 items-center justify-center rounded-full bg-accent text-white">
+            <span className="bg-accent flex size-6 items-center justify-center rounded-full text-white">
               <ThumbsUp className="size-3" />
             </span>
             <button
               type="button"
               onClick={() => onReactionDialogChange(true)}
-              className="font-medium text-ink transition hover:text-accent"
+              className="text-ink hover:text-accent font-medium transition"
             >
               {post.likeCount} reactions
             </button>
@@ -143,24 +153,27 @@ export default function FeedPostCard({
             onClick={onLike}
           >
             <ThumbsUp className="h-4 w-4" />
-           {post.isLiked ? "Liked" : "Like"}
+            {post.isLiked ? "Liked" : "Like"}
           </button>
           <button
-            className="flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
+            className="text-muted hover:bg-surface-muted hover:text-ink flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium transition"
             type="button"
             onClick={onToggleComments}
           >
             <MessageCircle className="h-4 w-4" />
             Comment
           </button>
-          <button className="flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink" type="button">
+          <button
+            className="text-muted hover:bg-surface-muted hover:text-ink flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium transition"
+            type="button"
+          >
             <Send className="h-4 w-4" />
             Share
           </button>
         </div>
 
         {isExpanded ? (
-          <div className="mt-5 space-y-4 border-t border-line/70 pt-4">
+          <div className="border-line/70 mt-5 space-y-4 border-t pt-4">
             <form
               className="flex gap-3"
               onSubmit={(event) => {
@@ -173,18 +186,18 @@ export default function FeedPostCard({
                 value={commentDraft}
                 onChange={(event) => onCommentDraftChange(event.target.value)}
                 placeholder="Write a comment..."
-                className="h-11 flex-1 rounded-full border border-line bg-white px-4 text-sm text-ink outline-none transition focus:border-accent/50"
+                className="border-line text-ink focus:border-accent/50 h-11 flex-1 rounded-full border bg-white px-4 text-sm outline-none transition"
               />
               <button
                 type="submit"
-                className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong"
+                className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition"
               >
                 Send
               </button>
             </form>
 
             {isCommentsLoading ? (
-              <div className="flex items-center gap-2 text-sm text-muted">
+              <div className="text-muted flex items-center gap-2 text-sm">
                 <LoaderCircle className="h-4 w-4 animate-spin" />
                 Loading comments...
               </div>
@@ -205,7 +218,7 @@ export default function FeedPostCard({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted">No comments yet. Start the conversation.</p>
+              <p className="text-muted text-sm">No comments yet. Start the conversation.</p>
             )}
           </div>
         ) : null}

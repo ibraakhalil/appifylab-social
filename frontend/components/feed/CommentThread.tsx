@@ -64,20 +64,23 @@ function ReplyCard({
       <div className="rounded-3xl bg-white p-4 shadow-sm">
         <div className="flex items-start gap-3">
           <Link href={buildProfileHref(reply.author.id)} className="shrink-0">
-            <Avatar name={`${reply.author.firstName} ${reply.author.lastName}`} className="h-9 w-9 text-sm" />
+            <Avatar
+              name={`${reply.author.firstName} ${reply.author.lastName}`}
+              className="h-9 w-9 text-sm"
+            />
           </Link>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={buildProfileHref(reply.author.id)}
-                className="text-sm font-semibold text-ink transition hover:text-accent"
+                className="text-ink hover:text-accent text-sm font-semibold transition"
               >
                 {reply.author.firstName} {reply.author.lastName}
               </Link>
-              <span className="text-xs text-muted">{formatRelativeTime(reply.createdAt)}</span>
+              <span className="text-muted text-xs">{formatRelativeTime(reply.createdAt)}</span>
             </div>
-            <p className="mt-2 text-sm leading-6 text-muted">{reply.content}</p>
-            <div className="mt-3 flex flex-wrap items-center gap-4 text-xs font-medium text-muted">
+            <p className="text-muted mt-2 text-sm leading-6">{reply.content}</p>
+            <div className="text-muted mt-3 flex flex-wrap items-center gap-4 text-xs font-medium">
               <button
                 type="button"
                 onClick={() => void onToggleLike(reply.id)}
@@ -88,7 +91,7 @@ function ReplyCard({
               <button
                 type="button"
                 onClick={() => void handleReactionDialogChange(true)}
-                className="transition hover:text-ink"
+                className="hover:text-ink transition"
               >
                 {reply.likeCount} reactions
               </button>
@@ -155,23 +158,26 @@ export default function CommentThread({
   return (
     <>
       <div className="space-y-3">
-        <div className="rounded-3xl bg-surface-muted p-4">
+        <div className="bg-surface-muted rounded-3xl p-4">
           <div className="flex items-start gap-3">
             <Link href={buildProfileHref(comment.author.id)} className="shrink-0">
-              <Avatar name={`${comment.author.firstName} ${comment.author.lastName}`} className="h-10 w-10 text-sm" />
+              <Avatar
+                name={`${comment.author.firstName} ${comment.author.lastName}`}
+                className="h-10 w-10 text-sm"
+              />
             </Link>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={buildProfileHref(comment.author.id)}
-                  className="text-sm font-semibold text-ink transition hover:text-accent"
+                  className="text-ink hover:text-accent text-sm font-semibold transition"
                 >
                   {comment.author.firstName} {comment.author.lastName}
                 </Link>
-                <span className="text-xs text-muted">{formatRelativeTime(comment.createdAt)}</span>
+                <span className="text-muted text-xs">{formatRelativeTime(comment.createdAt)}</span>
               </div>
-              <p className="mt-2 text-sm leading-6 text-muted">{comment.content}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-xs font-medium text-muted">
+              <p className="text-muted mt-2 text-sm leading-6">{comment.content}</p>
+              <div className="text-muted mt-3 flex flex-wrap items-center gap-4 text-xs font-medium">
                 <button
                   type="button"
                   onClick={() => void onToggleLike(comment.id)}
@@ -182,14 +188,14 @@ export default function CommentThread({
                 <button
                   type="button"
                   onClick={() => void handleReactionDialogChange(true)}
-                  className="transition hover:text-ink"
+                  className="hover:text-ink transition"
                 >
                   {comment.likeCount} reactions
                 </button>
                 <button
                   type="button"
                   onClick={() => onReplyChange(comment.id, replyDrafts[comment.id] ?? "")}
-                  className="transition hover:text-ink"
+                  className="hover:text-ink transition"
                 >
                   Reply
                 </button>
@@ -210,11 +216,11 @@ export default function CommentThread({
               value={replyDrafts[comment.id] ?? ""}
               onChange={(event) => onReplyChange(comment.id, event.target.value)}
               placeholder="Write a reply..."
-              className="h-11 flex-1 rounded-full border border-line bg-white px-4 text-sm text-ink outline-none transition focus:border-accent/50"
+              className="border-line text-ink focus:border-accent/50 h-11 flex-1 rounded-full border bg-white px-4 text-sm outline-none transition"
             />
             <button
               type="submit"
-              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong"
+              className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition"
             >
               Reply
             </button>
@@ -222,7 +228,7 @@ export default function CommentThread({
         ) : null}
 
         {comment.replies.length ? (
-          <div className="ml-6 space-y-3 border-l border-line pl-4">
+          <div className="border-line ml-6 space-y-3 border-l pl-4">
             {comment.replies.map((reply) => (
               <ReplyCard
                 key={reply.id}

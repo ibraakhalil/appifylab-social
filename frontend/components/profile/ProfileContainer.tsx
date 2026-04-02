@@ -54,7 +54,9 @@ export default function ProfileContainer({ userId }: ProfileContainerProps) {
 
   return (
     <ProfileContent
-      emptyStateMessage={userId ? "No public posts to show yet." : "You have not published any posts yet."}
+      emptyStateMessage={
+        userId ? "No public posts to show yet." : "You have not published any posts yet."
+      }
       loadPosts={loadPosts}
       loadProfile={loadProfile}
       onUnauthorized={handleUnauthorized}

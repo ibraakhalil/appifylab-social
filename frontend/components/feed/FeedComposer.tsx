@@ -80,14 +80,14 @@ export default function FeedComposer({
   return (
     <section className="rounded-2xl bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
       <div className="flex items-start gap-3">
-        <Avatar name={currentUserName} className="mt-1 max-sm:hidden size-11 text-sm" />
+        <Avatar name={currentUserName} className="mt-1 size-11 text-sm max-sm:hidden" />
         <form className="flex-1 space-y-3" onSubmit={handleSubmit}>
           <div className="relative">
             <textarea
               value={composer.contentText}
               onChange={(event) => onContentTextChange(event.target.value)}
               className={cn(
-                "min-h-28 w-full rounded-lg border border-transparent bg-surface-muted px-5 py-4 text-sm text-ink outline-none transition focus:border-accent/50 focus:bg-white",
+                "bg-surface-muted text-ink focus:border-accent/50 min-h-28 w-full rounded-lg border border-transparent px-5 py-4 text-sm outline-none transition focus:bg-white",
                 composer.imagePreviewUrl ? "pr-28" : undefined,
               )}
               placeholder={`What's on your mind, ${currentUserFirstName}?`}
@@ -104,7 +104,7 @@ export default function FeedComposer({
                 />
                 <button
                   aria-label="Remove selected photo"
-                  className="rounded-full p-1 text-muted transition hover:bg-surface-muted hover:text-ink"
+                  className="text-muted hover:bg-surface-muted hover:text-ink rounded-full p-1 transition"
                   type="button"
                   onClick={() => onImageChange(null)}
                 >
@@ -120,25 +120,25 @@ export default function FeedComposer({
             </div>
           ) : null}
 
-          <div className="mt-4 flex items-center lg:flex-wrap justify-between gap-3">
+          <div className="mt-4 flex items-center justify-between gap-3 lg:flex-wrap">
             <div className="flex items-center gap-2">
-             <button
-                className="flex items-center justify-center gap-2 rounded-2xl px-3  text-sm font-medium text-muted transition  hover:text-ink"
+              <button
+                className="text-muted hover:text-ink flex items-center justify-center gap-2 rounded-2xl px-3 text-sm font-medium transition"
                 type="button"
                 onClick={handlePhotoButtonClick}
               >
-                <ImagePlus className="h-4 w-4 text-success" />
+                <ImagePlus className="text-success h-4 w-4" />
                 <span className="max-md:hidden">Photo</span>
               </button>
               <button
-                className="flex items-center justify-center gap-2 rounded-2xl px-3  text-sm font-medium text-muted transition  hover:text-ink"
+                className="text-muted hover:text-ink flex items-center justify-center gap-2 rounded-2xl px-3 text-sm font-medium transition"
                 type="button"
               >
-                <Video className="h-4 w-4 text-accent" />
-               <span className="max-md:hidden">Live</span>
+                <Video className="text-accent h-4 w-4" />
+                <span className="max-md:hidden">Live</span>
               </button>
               <button
-                className="flex items-center justify-center gap-2 rounded-2xl px-3  text-sm font-medium text-muted transition  hover:text-ink"
+                className="text-muted hover:text-ink flex items-center justify-center gap-2 rounded-2xl px-3 text-sm font-medium transition"
                 type="button"
               >
                 <CalendarDays className="h-4 w-4 text-[#fb8c00]" />
@@ -150,12 +150,12 @@ export default function FeedComposer({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="flex items-center justify-between gap-2  bg-gray-100 py-0.5 rounded-full  px-2 text-[13px] text-ink outline-none transition  focus:border-accent/50"
+                    className="text-ink focus:border-accent/50 flex items-center justify-between gap-2 rounded-full bg-gray-100 px-2 py-0.5 text-[13px] outline-none transition"
                     type="button"
                   >
-                    <VisibilityIcon className="size-3.5 text-muted" />
-                    <span >{visibilityLabel}</span>
-                    <ChevronDown className="h-4 w-4 text-muted" />
+                    <VisibilityIcon className="text-muted size-3.5" />
+                    <span>{visibilityLabel}</span>
+                    <ChevronDown className="text-muted h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
@@ -167,24 +167,25 @@ export default function FeedComposer({
                   >
                     <DropdownMenuRadioItem value="public">
                       <span className="flex items-center gap-2">
-                        <Globe className="h-4 w-4 text-muted" />
+                        <Globe className="text-muted h-4 w-4" />
                         Public
                       </span>
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="private">
                       <span className="flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-muted" />
+                        <Lock className="text-muted h-4 w-4" />
                         Private
                       </span>
                     </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? <CircleIcon/> : <SendHorizontalIcon className="text-accent size-5"/>}
+              <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <CircleIcon />
+                ) : (
+                  <SendHorizontalIcon className="text-accent size-5" />
+                )}
               </button>
             </div>
           </div>

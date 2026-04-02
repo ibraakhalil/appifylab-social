@@ -12,13 +12,7 @@ export default function StoriesSection() {
     "/stories/story-4.png",
     "/stories/story-5.png",
   ];
-  const storyNames = [
-    "Aariz Rahman",
-    "Nusrat Jahan",
-    "Tanvir Hasan",
-    "Mim Akter",
-    "Sajid Hossain",
-  ];
+  const storyNames = ["Aariz Rahman", "Nusrat Jahan", "Tanvir Hasan", "Mim Akter", "Sajid Hossain"];
 
   return (
     <section className="">
@@ -46,12 +40,12 @@ export default function StoriesSection() {
             />
             {story.isAdd ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 text-center">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-white">
+                <span className="bg-accent flex h-12 w-12 items-center justify-center rounded-full text-white">
                   <Plus className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-ink">Create story</p>
-                  <p className="mt-1 text-xs text-muted">Share a quick update</p>
+                  <p className="text-ink text-sm font-semibold">Create story</p>
+                  <p className="text-muted mt-1 text-xs">Share a quick update</p>
                 </div>
               </div>
             ) : (

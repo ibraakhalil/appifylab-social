@@ -5,12 +5,12 @@ import MobileBottomNav from "./MobileBottomNav";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-page text-ink">
+    <div className="bg-page text-ink min-h-screen">
       <DesktopHeader />
       <MobileHeader />
       <MobileBottomNav />
       <main
-        className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 "
+        className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8"
         style={{ paddingTop: "var(--layout-offset)" }}
       >
         {children}

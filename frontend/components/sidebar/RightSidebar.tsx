@@ -13,10 +13,10 @@ export default function RightSidebar() {
       }}
     >
       <div className="space-y-4">
-        <section className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+        <section className="border-line rounded-2xl border bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold text-ink">Friends</h2>
-            <Link className="text-xs font-semibold text-accent" href="#">
+            <h2 className="text-ink text-base font-semibold">Friends</h2>
+            <Link className="text-accent text-xs font-semibold" href="#">
               See all
             </Link>
           </div>
@@ -24,7 +24,7 @@ export default function RightSidebar() {
             {friends.slice(0, 4).map((friend) => (
               <li key={friend.id}>
                 <Link
-                  className="flex items-center gap-3 rounded-xl border border-line px-3 py-3 transition hover:bg-surface-muted"
+                  className="border-line hover:bg-surface-muted flex items-center gap-3 rounded-xl border px-3 py-3 transition"
                   href="#"
                 >
                   <Image
@@ -35,8 +35,8 @@ export default function RightSidebar() {
                     className="h-10 w-10 rounded-full object-cover"
                   />
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-semibold text-ink">{friend.name}</h3>
-                    <p className="mt-0.5 text-xs text-muted">{friend.time ?? friend.role}</p>
+                    <h3 className="text-ink text-sm font-semibold">{friend.name}</h3>
+                    <p className="text-muted mt-0.5 text-xs">{friend.time ?? friend.role}</p>
                   </div>
                 </Link>
               </li>
@@ -44,19 +44,19 @@ export default function RightSidebar() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+        <section className="border-line rounded-2xl border bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold text-ink">Online Friends</h2>
-            <Link className="text-xs font-semibold text-accent" href="#">
+            <h2 className="text-ink text-base font-semibold">Online Friends</h2>
+            <Link className="text-accent text-xs font-semibold" href="#">
               See all
             </Link>
           </div>
 
           <form className="relative mb-4">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle" />
+            <Search className="text-subtle pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2" />
             <input
               type="text"
-              className="h-10 w-full rounded-xl border border-line bg-white pl-10 pr-4 text-sm text-ink outline-none transition focus:border-accent/50"
+              className="border-line text-ink focus:border-accent/50 h-10 w-full rounded-xl border bg-white pl-10 pr-4 text-sm outline-none transition"
               placeholder="Search friends"
             />
           </form>
@@ -65,7 +65,10 @@ export default function RightSidebar() {
             {friends
               .filter((friend) => friend.active)
               .map((friend) => (
-                <li key={friend.id} className="flex items-center gap-3 rounded-xl border border-line px-3 py-3">
+                <li
+                  key={friend.id}
+                  className="border-line flex items-center gap-3 rounded-xl border px-3 py-3"
+                >
                   <Link className="flex min-w-0 flex-1 items-center gap-3" href="#">
                     <div className="relative">
                       <Image
@@ -75,15 +78,15 @@ export default function RightSidebar() {
                         alt={friend.name}
                         className="h-10 w-10 rounded-full object-cover"
                       />
-                      <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-success" />
+                      <span className="bg-success absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="truncate text-sm font-semibold text-ink">{friend.name}</h3>
-                      <p className="mt-0.5 text-xs text-muted">{friend.role}</p>
+                      <h3 className="text-ink truncate text-sm font-semibold">{friend.name}</h3>
+                      <p className="text-muted mt-0.5 text-xs">{friend.role}</p>
                     </div>
                   </Link>
                   <button
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-muted transition hover:border-accent/40 hover:text-accent"
+                    className="border-line text-muted hover:border-accent/40 hover:text-accent flex h-9 w-9 items-center justify-center rounded-lg border transition"
                     type="button"
                     aria-label={`Message ${friend.name}`}
                   >

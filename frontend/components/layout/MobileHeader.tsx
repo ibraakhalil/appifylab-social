@@ -27,7 +27,7 @@ export default function MobileHeader() {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b border-line/70 bg-white/95 backdrop-blur lg:hidden"
+      className="border-line/70 sticky top-0 z-50 border-b bg-white/95 backdrop-blur lg:hidden"
       style={{ height: "var(--header-height)" }}
     >
       <div
@@ -48,11 +48,11 @@ export default function MobileHeader() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="relative flex h-11 w-11 items-center justify-center rounded-2xl text-muted transition hover:text-accent"
+            className="text-muted hover:text-accent relative flex h-11 w-11 items-center justify-center rounded-2xl transition"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+            <span className="bg-accent absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white">
               6
             </span>
           </button>
@@ -64,8 +64,11 @@ export default function MobileHeader() {
                   type="button"
                   aria-label="Open menu"
                 >
-                  <Avatar name={`${user.firstName} ${user.lastName}`} className="h-10 w-10 text-xs" />
-                  <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-white text-subtle shadow-sm">
+                  <Avatar
+                    name={`${user.firstName} ${user.lastName}`}
+                    className="h-10 w-10 text-xs"
+                  />
+                  <span className="text-subtle absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-white shadow-sm">
                     <ChevronDown className="h-3 w-3" />
                   </span>
                 </button>
@@ -73,25 +76,28 @@ export default function MobileHeader() {
               <DropdownMenuContent align="end" className="w-60 p-2">
                 <DropdownMenuLabel className="px-3 py-3">
                   <div className="flex items-center gap-3 normal-case tracking-normal">
-                    <Avatar name={`${user.firstName} ${user.lastName}`} className="h-9 w-9 text-xs" />
+                    <Avatar
+                      name={`${user.firstName} ${user.lastName}`}
+                      className="h-9 w-9 text-xs"
+                    />
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-ink">
+                      <p className="text-ink truncate text-sm font-semibold">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="truncate text-xs font-medium text-muted">{user.email}</p>
+                      <p className="text-muted truncate text-xs font-medium">{user.email}</p>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/" className="flex items-center gap-3">
-                    <Home className="h-4 w-4 text-muted" />
+                    <Home className="text-muted h-4 w-4" />
                     Home
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="flex items-center gap-3">
-                    <UserRound className="h-4 w-4 text-muted" />
+                    <UserRound className="text-muted h-4 w-4" />
                     Account
                   </Link>
                 </DropdownMenuItem>
@@ -108,7 +114,7 @@ export default function MobileHeader() {
           ) : (
             <Link
               href="/login"
-              className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong"
+              className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition"
             >
               Login
             </Link>

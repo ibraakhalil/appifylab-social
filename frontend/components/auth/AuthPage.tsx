@@ -4,14 +4,7 @@ import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  LockKeyhole,
-  Mail,
-  ShieldCheck,
-  User,
-  UserPlus,
-} from "lucide-react";
+import { ArrowRight, LockKeyhole, Mail, ShieldCheck, User, UserPlus } from "lucide-react";
 
 import { useAuth } from "@/hooks/useAuth";
 
@@ -75,16 +68,16 @@ function AuthInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-medium text-ink">{label}</span>
+      <span className="text-ink mb-2 block text-sm font-medium">{label}</span>
       <span className="relative block">
-        <Icon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle" />
+        <Icon className="text-subtle pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2" />
         <input
           name={name}
           onChange={onChange}
           placeholder={placeholder}
           type={type}
           value={value}
-          className="h-12 w-full rounded-2xl border border-line bg-white pl-11 pr-4 text-sm text-ink outline-none transition focus:border-accent/50 focus:ring-4 focus:ring-accent/10"
+          className="border-line text-ink focus:border-accent/50 focus:ring-accent/10 h-12 w-full rounded-2xl border bg-white pl-11 pr-4 text-sm outline-none transition focus:ring-4"
         />
       </span>
     </label>
@@ -161,20 +154,38 @@ export default function AuthPage({ mode }: AuthPageProps) {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-page">
+    <main className="bg-page relative min-h-screen overflow-hidden">
       <div className="pointer-events-none absolute left-0 top-0 hidden lg:block">
-        <Image src="/images/shape1.svg" width={174} height={220} alt="" className="h-auto w-[150px] xl:w-[174px]" />
+        <Image
+          src="/images/shape1.svg"
+          width={174}
+          height={220}
+          alt=""
+          className="h-auto w-[150px] xl:w-[174px]"
+        />
       </div>
       <div className="pointer-events-none absolute right-0 top-0 hidden lg:block">
-        <Image src="/images/shape2.svg" width={480} height={420} alt="" className="h-auto w-[360px] xl:w-[480px]" />
+        <Image
+          src="/images/shape2.svg"
+          width={480}
+          height={420}
+          alt=""
+          className="h-auto w-[360px] xl:w-[480px]"
+        />
       </div>
       <div className="pointer-events-none absolute bottom-0 right-[8%] hidden xl:block">
-        <Image src="/images/shape3.svg" width={420} height={320} alt="" className="h-auto w-[360px]" />
+        <Image
+          src="/images/shape3.svg"
+          width={420}
+          height={320}
+          alt=""
+          className="h-auto w-[360px]"
+        />
       </div>
 
       <div className="relative mx-auto grid min-h-screen max-w-[1440px] items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_28rem] lg:px-8 lg:py-16">
         <section className="relative hidden lg:block">
-          <div className="relative mx-auto max-w-[660px] ">
+          <div className="relative mx-auto max-w-[660px]">
             <div className="relative mt-10">
               <Image
                 src={content.heroImage}
@@ -187,12 +198,12 @@ export default function AuthPage({ mode }: AuthPageProps) {
               {isRegistration ? (
                 <div className="absolute -bottom-2 right-8 w-[180px] rounded-lg bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.14)]">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+                    <span className="bg-accent/10 text-accent flex h-11 w-11 items-center justify-center rounded-2xl">
                       <UserPlus className="h-5 w-5" />
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-ink">Account setup</p>
-                      <p className="text-xs text-muted">Ready in a few steps</p>
+                      <p className="text-ink text-sm font-semibold">Account setup</p>
+                      <p className="text-muted text-xs">Ready in a few steps</p>
                     </div>
                   </div>
                 </div>
@@ -203,13 +214,12 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
         <section className="mx-auto w-full max-w-[448px]">
           <div className="rounded-[32px] border border-white/70 bg-white p-6 shadow-[0_24px_60px_rgba(17,32,50,0.12)] sm:p-8">
-
-            <div className="text-center mb-10">
-              <h2 className=" text-[28px] font-semibold leading-tight text-ink">{content.title}</h2>
-              <p className="mt-2 text-sm text-muted">Join Buddy Script and connect with your friends</p>
+            <div className="mb-10 text-center">
+              <h2 className="text-ink text-[28px] font-semibold leading-tight">{content.title}</h2>
+              <p className="text-muted mt-2 text-sm">
+                Join Buddy Script and connect with your friends
+              </p>
             </div>
-
-
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               {isRegistration ? (
@@ -271,33 +281,38 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 </div>
               ) : null}
 
-              <div className={`flex gap-3 text-sm ${isRegistration ? "items-start" : "items-center justify-between"}`}>
-                <label className="flex cursor-pointer items-center gap-3 text-muted">
+              <div
+                className={`flex gap-3 text-sm ${isRegistration ? "items-start" : "items-center justify-between"}`}
+              >
+                <label className="text-muted flex cursor-pointer items-center gap-3">
                   <input
                     type="checkbox"
                     defaultChecked
-                    className="h-4 w-4 rounded border-line text-accent focus:ring-accent/20"
+                    className="border-line text-accent focus:ring-accent/20 h-4 w-4 rounded"
                   />
                   <span>{isRegistration ? "I agree to terms & conditions" : "Remember me"}</span>
                 </label>
                 {!isRegistration ? (
-                  <span className="font-medium text-subtle">JWT session enabled</span>
+                  <span className="text-subtle font-medium">JWT session enabled</span>
                 ) : null}
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting || !isReady}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:bg-accent/60"
+                className="bg-accent hover:bg-accent-strong disabled:bg-accent/60 flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-white transition disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Please wait..." : content.submitLabel}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
 
-            <p className="mt-8 text-center text-sm text-muted">
+            <p className="text-muted mt-8 text-center text-sm">
               {content.switchCopy}{" "}
-              <Link href={content.switchHref} className="font-semibold text-accent transition hover:text-accent-strong">
+              <Link
+                href={content.switchHref}
+                className="text-accent hover:text-accent-strong font-semibold transition"
+              >
                 {content.switchLabel}
               </Link>
             </p>

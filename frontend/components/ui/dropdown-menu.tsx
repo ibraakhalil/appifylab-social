@@ -16,7 +16,10 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn("px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-subtle", className)}
+    className={cn(
+      "text-subtle px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]",
+      className,
+    )}
     {...props}
   />
 ));
@@ -31,7 +34,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-44 overflow-hidden rounded-2xl border border-white/80 bg-white p-1.5 text-ink shadow-[0_18px_45px_rgba(17,32,50,0.14)] outline-none",
+        "text-ink z-50 min-w-44 overflow-hidden rounded-2xl border border-white/80 bg-white p-1.5 shadow-[0_18px_45px_rgba(17,32,50,0.14)] outline-none",
         "data-[side=bottom]:animate-in data-[side=bottom]:fade-in-0 data-[side=bottom]:slide-in-from-top-2",
         className,
       )}
@@ -48,7 +51,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-xl px-3 py-2.5 text-sm text-ink outline-none transition focus:bg-surface-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "text-ink focus:bg-surface-muted flex cursor-default select-none items-center rounded-xl px-3 py-2.5 text-sm outline-none transition data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
     {...props}
@@ -60,7 +63,9 @@ function DropdownMenuSeparator({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator className={cn("my-1 h-px bg-line", className)} {...props} />;
+  return (
+    <DropdownMenuPrimitive.Separator className={cn("bg-line my-1 h-px", className)} {...props} />
+  );
 }
 
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
@@ -72,14 +77,14 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-xl py-2.5 pl-9 pr-3 text-sm text-ink outline-none transition focus:bg-surface-muted data-[state=checked]:bg-surface-muted",
+      "text-ink focus:bg-surface-muted data-[state=checked]:bg-surface-muted relative flex cursor-default select-none items-center rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none transition",
       className,
     )}
     {...props}
   >
     <span className="absolute left-3 flex h-4 w-4 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 text-accent" />
+        <Check className="text-accent h-4 w-4" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}

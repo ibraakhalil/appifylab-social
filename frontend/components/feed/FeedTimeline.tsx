@@ -53,68 +53,77 @@ export default function FeedTimeline({
   const [loadingCommentsForPostId, setLoadingCommentsForPostId] = useState<string | null>(null);
   const [loadingReactionsForPostId, setLoadingReactionsForPostId] = useState<string | null>(null);
 
-  const loadFeed = useCallback(async (cursor?: string | null) => {
-    try {
-      const response = await loadPosts(cursor);
-      setPosts((current) => (cursor ? [...current, ...response.items] : response.items));
-      setNextCursor(response.nextCursor);
-      setError(null);
-    } catch (loadError) {
-      if (loadError instanceof ApiError && loadError.status === 401) {
-        onUnauthorized();
-        return;
+  const loadFeed = useCallback(
+    async (cursor?: string | null) => {
+      try {
+        const response = await loadPosts(cursor);
+        setPosts((current) => (cursor ? [...current, ...response.items] : response.items));
+        setNextCursor(response.nextCursor);
+        setError(null);
+      } catch (loadError) {
+        if (loadError instanceof ApiError && loadError.status === 401) {
+          onUnauthorized();
+          return;
+        }
+
+        setError(loadError instanceof Error ? loadError.message : "Unable to load feed.");
+      } finally {
+        setIsFeedLoading(false);
+        setIsLoadingMore(false);
       }
+    },
+    [loadPosts, onUnauthorized],
+  );
 
-      setError(loadError instanceof Error ? loadError.message : "Unable to load feed.");
-    } finally {
-      setIsFeedLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, [loadPosts, onUnauthorized]);
+  const loadCommentsForPost = useCallback(
+    async (postId: string) => {
+      setLoadingCommentsForPostId(postId);
 
-  const loadCommentsForPost = useCallback(async (postId: string) => {
-    setLoadingCommentsForPostId(postId);
+      try {
+        const response = await getComments(postId);
+        setCommentsByPostId((current) => ({
+          ...current,
+          [postId]: response.items,
+        }));
+        setError(null);
+      } catch (loadError) {
+        if (loadError instanceof ApiError && loadError.status === 401) {
+          onUnauthorized();
+          return;
+        }
 
-    try {
-      const response = await getComments(postId);
-      setCommentsByPostId((current) => ({
-        ...current,
-        [postId]: response.items,
-      }));
-      setError(null);
-    } catch (loadError) {
-      if (loadError instanceof ApiError && loadError.status === 401) {
-        onUnauthorized();
-        return;
+        setError(loadError instanceof Error ? loadError.message : "Unable to load comments.");
+      } finally {
+        setLoadingCommentsForPostId(null);
       }
+    },
+    [onUnauthorized],
+  );
 
-      setError(loadError instanceof Error ? loadError.message : "Unable to load comments.");
-    } finally {
-      setLoadingCommentsForPostId(null);
-    }
-  }, [onUnauthorized]);
+  const loadReactionsForPost = useCallback(
+    async (postId: string) => {
+      setLoadingReactionsForPostId(postId);
 
-  const loadReactionsForPost = useCallback(async (postId: string) => {
-    setLoadingReactionsForPostId(postId);
+      try {
+        const response = await getPostLikes(postId);
+        setReactionsByPostId((current) => ({
+          ...current,
+          [postId]: response.items,
+        }));
+        setError(null);
+      } catch (loadError) {
+        if (loadError instanceof ApiError && loadError.status === 401) {
+          onUnauthorized();
+          return;
+        }
 
-    try {
-      const response = await getPostLikes(postId);
-      setReactionsByPostId((current) => ({
-        ...current,
-        [postId]: response.items,
-      }));
-      setError(null);
-    } catch (loadError) {
-      if (loadError instanceof ApiError && loadError.status === 401) {
-        onUnauthorized();
-        return;
+        setError(loadError instanceof Error ? loadError.message : "Unable to load reactions.");
+      } finally {
+        setLoadingReactionsForPostId(null);
       }
-
-      setError(loadError instanceof Error ? loadError.message : "Unable to load reactions.");
-    } finally {
-      setLoadingReactionsForPostId(null);
-    }
-  }, [onUnauthorized]);
+    },
+    [onUnauthorized],
+  );
 
   useEffect(() => {
     setPosts([]);
@@ -270,9 +279,7 @@ export default function FeedTimeline({
         return;
       }
 
-      setError(
-        submissionError instanceof Error ? submissionError.message : "Unable to add reply.",
-      );
+      setError(submissionError instanceof Error ? submissionError.message : "Unable to add reply.");
     }
   };
 
@@ -289,7 +296,9 @@ export default function FeedTimeline({
         return;
       }
 
-      setError(toggleError instanceof Error ? toggleError.message : "Unable to update comment like.");
+      setError(
+        toggleError instanceof Error ? toggleError.message : "Unable to update comment like.",
+      );
     }
   };
 
@@ -316,8 +325,6 @@ export default function FeedTimeline({
 
   return (
     <>
-
-
       {error ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
@@ -363,8 +370,8 @@ export default function FeedTimeline({
       ))}
 
       {!posts.length && !nextCursor ? (
-        <div className="rounded-2xl border border-line bg-white px-5 py-10 text-center shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
-          <p className="text-sm font-medium text-ink">{emptyStateMessage}</p>
+        <div className="border-line rounded-2xl border bg-white px-5 py-10 text-center shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
+          <p className="text-ink text-sm font-medium">{emptyStateMessage}</p>
         </div>
       ) : null}
 
@@ -376,7 +383,7 @@ export default function FeedTimeline({
             void loadFeed(nextCursor);
           }}
           disabled={isLoadingMore}
-          className="w-full rounded-lg border border-line bg-white px-5 py-4 text-sm font-semibold text-ink shadow-[0_18px_45px_rgba(17,32,50,0.08)] transition hover:border-accent/40 hover:text-accent disabled:cursor-not-allowed disabled:opacity-70"
+          className="border-line text-ink hover:border-accent/40 hover:text-accent w-full rounded-lg border bg-white px-5 py-4 text-sm font-semibold shadow-[0_18px_45px_rgba(17,32,50,0.08)] transition disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoadingMore ? "Loading more..." : loadMoreLabel}
         </button>

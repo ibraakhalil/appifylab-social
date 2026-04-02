@@ -22,9 +22,6 @@ export const posts = sqliteTable(
   (table) => [
     index("posts_author_id_idx").on(table.authorId),
     index("posts_created_at_idx").on(table.createdAt),
-    check(
-      "posts_visibility_check",
-      sql`${table.visibility} in ('public', 'private')`,
-    ),
+    check("posts_visibility_check", sql`${table.visibility} in ('public', 'private')`),
   ],
 );

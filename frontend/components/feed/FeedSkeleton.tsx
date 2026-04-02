@@ -7,7 +7,7 @@ type FeedSkeletonProps = {
 };
 
 function SkeletonBlock({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-2xl bg-surface-muted", className)} />;
+  return <div className={cn("bg-surface-muted animate-pulse rounded-2xl", className)} />;
 }
 
 function FeedComposerSkeleton() {
@@ -27,7 +27,7 @@ function FeedComposerSkeleton() {
 
             <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
               <SkeletonBlock className="h-11 w-28 rounded-lg" />
-              <SkeletonBlock className="h-11 w-20 rounded-lg bg-accent/15" />
+              <SkeletonBlock className="bg-accent/15 h-11 w-20 rounded-lg" />
             </div>
           </div>
         </div>
@@ -48,11 +48,11 @@ function StoriesSkeleton() {
               key={index}
               className="relative h-[200px] w-[138px] shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm"
             >
-              <div className="absolute inset-0 animate-pulse bg-surface-muted" />
+              <div className="bg-surface-muted absolute inset-0 animate-pulse" />
 
               {isAddCard ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-4">
-                  <SkeletonBlock className="h-12 w-12 rounded-full bg-accent/15" />
+                  <SkeletonBlock className="bg-accent/15 h-12 w-12 rounded-full" />
                   <div className="w-full space-y-2">
                     <SkeletonBlock className="mx-auto h-4 w-24 rounded-full" />
                     <SkeletonBlock className="mx-auto h-3 w-20 rounded-full" />
@@ -99,12 +99,12 @@ function FeedPostSkeleton({
         {textLineWidths.map((width) => (
           <SkeletonBlock key={width} className={cn("h-4 rounded-full", width)} />
         ))}
-        {hasImage ? <SkeletonBlock className="h-72 rounded-lg border border-line/70" /> : null}
+        {hasImage ? <SkeletonBlock className="border-line/70 h-72 rounded-lg border" /> : null}
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 border-b border-line/70 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-line/70 mt-4 flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="inline-flex items-center gap-2">
-          <SkeletonBlock className="h-8 w-8 rounded-full bg-accent/15" />
+          <SkeletonBlock className="bg-accent/15 h-8 w-8 rounded-full" />
           <SkeletonBlock className="h-4 w-24 rounded-full" />
         </div>
         <SkeletonBlock className="h-4 w-24 rounded-full" />

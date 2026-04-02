@@ -42,26 +42,26 @@ export default function ReactionUsersDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-surface-muted px-4 py-3">
-          <p className="text-sm font-medium text-ink">Total reactions</p>
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-muted">
+        <div className="bg-surface-muted mt-4 flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
+          <p className="text-ink text-sm font-medium">Total reactions</p>
+          <span className="text-muted rounded-full bg-white px-3 py-1 text-xs font-semibold">
             {users.length}
           </span>
         </div>
 
         {isLoading ? (
-          <div className="mt-4 flex items-center gap-2 text-sm text-muted">
+          <div className="text-muted mt-4 flex items-center gap-2 text-sm">
             <LoaderCircle className="h-4 w-4 animate-spin" />
             Loading reactions...
           </div>
         ) : error ? (
           <p className="mt-4 text-sm text-red-600">{error}</p>
         ) : users.length ? (
-          <div className="mt-4 max-h-88 space-y-3 overflow-y-auto pr-1">
+          <div className="max-h-88 mt-4 space-y-3 overflow-y-auto pr-1">
             {users.map((user) => (
               <div
                 key={user.id}
-                className="flex items-center gap-3 rounded-2xl border border-line/70 bg-surface-muted/60 px-3 py-3"
+                className="border-line/70 bg-surface-muted/60 flex items-center gap-3 rounded-2xl border px-3 py-3"
               >
                 <Link href={buildProfileHref(user.id)} className="shrink-0">
                   <Avatar
@@ -72,17 +72,17 @@ export default function ReactionUsersDialog({
                 <div className="min-w-0">
                   <Link
                     href={buildProfileHref(user.id)}
-                    className="truncate text-sm font-medium text-ink transition hover:text-accent"
+                    className="text-ink hover:text-accent truncate text-sm font-medium transition"
                   >
                     {user.firstName} {user.lastName}
                   </Link>
-                  <p className="truncate text-xs text-muted">{user.email}</p>
+                  <p className="text-muted truncate text-xs">{user.email}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="mt-4 text-sm text-muted">No reactions yet.</p>
+          <p className="text-muted mt-4 text-sm">No reactions yet.</p>
         )}
       </DialogContent>
     </Dialog>

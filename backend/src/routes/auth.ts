@@ -63,10 +63,7 @@ authRoutes.post("/login", jsonValidator(loginSchema), async (c) => {
     throw unauthorized("Invalid email or password.");
   }
 
-  const passwordMatches = await Bun.password.verify(
-    payload.password,
-    user.passwordHash,
-  );
+  const passwordMatches = await Bun.password.verify(payload.password, user.passwordHash);
 
   if (!passwordMatches) {
     throw unauthorized("Invalid email or password.");

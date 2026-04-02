@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  startTransition,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, startTransition, useEffect, useState } from "react";
 
 import { loginUser, registerUser, type LoginInput, type RegisterInput } from "@/lib/api/auth";
 import {

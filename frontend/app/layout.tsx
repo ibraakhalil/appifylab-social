@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.variable} ${hindSiliguri.variable} h-full antialiased`}>
-      <body className="min-h-full bg-page text-ink">
+      <body className="bg-page text-ink min-h-full">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

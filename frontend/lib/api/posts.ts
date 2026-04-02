@@ -27,8 +27,7 @@ export const togglePostLike = (postId: string) =>
     method: "POST",
   });
 
-export const getPostLikes = (postId: string) =>
-  apiFetch<LikesResponse>(`/posts/${postId}/likes`);
+export const getPostLikes = (postId: string) => apiFetch<LikesResponse>(`/posts/${postId}/likes`);
 
 export const getComments = (postId: string) =>
   apiFetch<CommentsResponse>(`/posts/${postId}/comments`);

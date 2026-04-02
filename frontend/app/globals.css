@@ -28,7 +28,6 @@
   --color-success: var(--success);
 }
 
-
 html {
   scroll-behavior: smooth;
 }
@@ -52,9 +51,8 @@ a {
   text-decoration: none;
 }
 
-
 button {
-    cursor: pointer ;
+  cursor: pointer;
 }
 
 img {
