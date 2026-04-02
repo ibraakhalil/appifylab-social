@@ -31,6 +31,10 @@ export type FeedResponse = {
   nextCursor: string | null;
 };
 
+export type LikesResponse = {
+  items: ApiUser[];
+};
+
 export type CommentItem = {
   author: ApiUser;
   content: string;

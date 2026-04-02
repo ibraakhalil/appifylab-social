@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { CommentsResponse, FeedResponse } from "@/lib/api/types";
+import type { CommentsResponse, FeedResponse, LikesResponse } from "@/lib/api/types";
 
 export type CreatePostInput = {
   formData: FormData;
@@ -27,6 +27,9 @@ export const togglePostLike = (postId: string) =>
     method: "POST",
   });
 
+export const getPostLikes = (postId: string) =>
+  apiFetch<LikesResponse>(`/posts/${postId}/likes`);
+
 export const getComments = (postId: string) =>
   apiFetch<CommentsResponse>(`/posts/${postId}/comments`);
 
@@ -41,6 +44,9 @@ export const toggleCommentLike = (commentId: string) =>
     method: "POST",
   });
 
+export const getCommentLikes = (commentId: string) =>
+  apiFetch<LikesResponse>(`/comments/${commentId}/likes`);
+
 export const createReply = (commentId: string, input: CreateReplyInput) =>
   apiFetch<{ id: string; message: string }>(`/comments/${commentId}/replies`, {
     body: JSON.stringify(input),
@@ -51,3 +57,6 @@ export const toggleReplyLike = (replyId: string) =>
   apiFetch<{ isLiked: boolean; likeCount: number }>(`/replies/${replyId}/like`, {
     method: "POST",
   });
+
+export const getReplyLikes = (replyId: string) =>
+  apiFetch<LikesResponse>(`/replies/${replyId}/likes`);

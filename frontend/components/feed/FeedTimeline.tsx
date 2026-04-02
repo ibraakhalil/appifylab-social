@@ -8,17 +8,19 @@ import {
   createReply,
   getComments,
   getFeed,
+  getPostLikes,
   toggleCommentLike,
   togglePostLike,
   toggleReplyLike,
 } from "@/lib/api/posts";
-import type { CommentItem, FeedPost } from "@/lib/api/types";
+import type { ApiUser, CommentItem, FeedPost } from "@/lib/api/types";
 
 import FeedLoadingState from "./FeedLoadingState";
 import FeedPostCard from "./FeedPostCard";
 import { updateCommentLikeState, updateReplyLikeState } from "./feedUtils";
 
 type PostCommentsState = Record<string, CommentItem[]>;
+type PostReactionsState = Record<string, ApiUser[]>;
 
 type FeedTimelineProps = {
   currentUserName: string;
@@ -33,7 +35,9 @@ export default function FeedTimeline({
 }: FeedTimelineProps) {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [commentsByPostId, setCommentsByPostId] = useState<PostCommentsState>({});
+  const [reactionsByPostId, setReactionsByPostId] = useState<PostReactionsState>({});
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [reactionDialogPostId, setReactionDialogPostId] = useState<string | null>(null);
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
@@ -42,6 +46,7 @@ export default function FeedTimeline({
   const [isFeedLoading, setIsFeedLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadingCommentsForPostId, setLoadingCommentsForPostId] = useState<string | null>(null);
+  const [loadingReactionsForPostId, setLoadingReactionsForPostId] = useState<string | null>(null);
 
   const loadFeed = useCallback(async (cursor?: string | null) => {
     try {
@@ -84,10 +89,34 @@ export default function FeedTimeline({
     }
   }, [onUnauthorized]);
 
+  const loadReactionsForPost = useCallback(async (postId: string) => {
+    setLoadingReactionsForPostId(postId);
+
+    try {
+      const response = await getPostLikes(postId);
+      setReactionsByPostId((current) => ({
+        ...current,
+        [postId]: response.items,
+      }));
+      setError(null);
+    } catch (loadError) {
+      if (loadError instanceof ApiError && loadError.status === 401) {
+        onUnauthorized();
+        return;
+      }
+
+      setError(loadError instanceof Error ? loadError.message : "Unable to load reactions.");
+    } finally {
+      setLoadingReactionsForPostId(null);
+    }
+  }, [onUnauthorized]);
+
   useEffect(() => {
     setPosts([]);
     setCommentsByPostId({});
+    setReactionsByPostId({});
     setExpandedPostId(null);
+    setReactionDialogPostId(null);
     setCommentDrafts({});
     setReplyDrafts({});
     setActiveReplyId(null);
@@ -96,6 +125,7 @@ export default function FeedTimeline({
     setIsFeedLoading(true);
     setIsLoadingMore(false);
     setLoadingCommentsForPostId(null);
+    setLoadingReactionsForPostId(null);
 
     void loadFeed();
   }, [loadFeed, refreshKey]);
@@ -149,6 +179,14 @@ export default function FeedTimeline({
 
     if (willExpand && !commentsByPostId[postId]) {
       await loadCommentsForPost(postId);
+    }
+  };
+
+  const handleReactionDialogChange = async (postId: string, open: boolean) => {
+    setReactionDialogPostId(open ? postId : null);
+
+    if (open && !reactionsByPostId[postId]) {
+      await loadReactionsForPost(postId);
     }
   };
 
@@ -290,6 +328,7 @@ export default function FeedTimeline({
           currentUserName={currentUserName}
           isCommentsLoading={loadingCommentsForPostId === post.id}
           isExpanded={expandedPostId === post.id}
+          isReactionsLoading={loadingReactionsForPostId === post.id}
           onCommentDraftChange={(value) =>
             setCommentDrafts((current) => ({
               ...current,
@@ -309,8 +348,12 @@ export default function FeedTimeline({
           }}
           onReplySubmit={(commentId) => handleReplySubmit(post.id, commentId)}
           onToggleComments={() => void handleToggleComments(post.id)}
+          onUnauthorized={onUnauthorized}
+          onReactionDialogChange={(open) => void handleReactionDialogChange(post.id, open)}
           post={post}
+          reactions={reactionsByPostId[post.id] ?? []}
           replyDrafts={replyDrafts}
+          showReactionDialog={reactionDialogPostId === post.id}
         />
       ))}
 
