@@ -32,7 +32,6 @@ jobs:
           test -n "$SERVER_USER" || { echo "SERVER_USER secret is required."; exit 1; }
           test -n "${{ secrets.SERVER_SSH_KEY }}" || { echo "SERVER_SSH_KEY secret is required."; exit 1; }
           test -n "${{ secrets.BACKEND_ENV_FILE }}" || { echo "BACKEND_ENV_FILE secret is required."; exit 1; }
-          test -n "${{ secrets.FRONTEND_ENV_FILE }}" || { echo "FRONTEND_ENV_FILE secret is required."; exit 1; }
 
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
@@ -72,17 +71,12 @@ jobs:
           ssh -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=accept-new \
             "$SERVER_USER@$SERVER_HOST" \
-            "mkdir -p '$APP_DIR/backend' '$APP_DIR/frontend'"
+            "mkdir -p '$APP_DIR/backend'"
 
           printf '%s\n' "${{ secrets.BACKEND_ENV_FILE }}" | ssh -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=accept-new \
             "$SERVER_USER@$SERVER_HOST" \
             "umask 077 && cat > '$APP_DIR/backend/.env'"
-
-          printf '%s\n' "${{ secrets.FRONTEND_ENV_FILE }}" | ssh -i ~/.ssh/id_rsa \
-            -o StrictHostKeyChecking=accept-new \
-            "$SERVER_USER@$SERVER_HOST" \
-            "umask 077 && cat > '$APP_DIR/frontend/.env'"
 
       - name: Run deployment script
         shell: bash
