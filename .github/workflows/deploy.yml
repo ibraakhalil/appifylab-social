@@ -17,9 +17,7 @@ jobs:
     env:
       APP_DIR: /home/ubuntu/appifylab-social
       SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      SERVER_PORT: ${{ secrets.SERVER_PORT }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
-      SSH_HOST_ALIAS: deploy-target
 
     steps:
       - name: Checkout repository
@@ -38,28 +36,15 @@ jobs:
           printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          PORT="${SERVER_PORT:-22}"
-
-          cat > ~/.ssh/config <<EOF
-          Host $SSH_HOST_ALIAS
-            HostName $SERVER_HOST
-            User $SERVER_USER
-            Port $PORT
-            IdentityFile ~/.ssh/id_rsa
-            StrictHostKeyChecking accept-new
-            ServerAliveInterval 30
-            ServerAliveCountMax 6
-          EOF
-
-          chmod 600 ~/.ssh/config
-          ssh -o BatchMode=yes "$SSH_HOST_ALIAS" "exit 0"
-
       - name: Ensure application directory exists
         shell: bash
         run: |
           set -Eeuo pipefail
 
-          ssh "$SSH_HOST_ALIAS" "mkdir -p '$APP_DIR'"
+          ssh -i ~/.ssh/id_rsa \
+            -o StrictHostKeyChecking=accept-new \
+            "$SERVER_USER@$SERVER_HOST" \
+            "mkdir -p '$APP_DIR'"
 
       - name: Sync repository to server
         shell: bash
@@ -72,12 +57,15 @@ jobs:
             --exclude 'node_modules/' \
             --exclude '.next/' \
             --exclude 'backend/public/posts/' \
-            -e "ssh" \
-            ./ "$SSH_HOST_ALIAS:$APP_DIR/"
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new" \
+            ./ "$SERVER_USER@$SERVER_HOST:$APP_DIR/"
 
       - name: Run deployment script
         shell: bash
         run: |
           set -Eeuo pipefail
 
-          ssh "$SSH_HOST_ALIAS" "cd '$APP_DIR' && chmod +x scripts/deploy.sh && ./scripts/deploy.sh"
+          ssh -i ~/.ssh/id_rsa \
+            -o StrictHostKeyChecking=accept-new \
+            "$SERVER_USER@$SERVER_HOST" \
+            "cd '$APP_DIR' && chmod +x scripts/deploy.sh && ./scripts/deploy.sh"
