@@ -51,14 +51,16 @@ jobs:
         run: |
           set -Eeuo pipefail
 
-          rsync -az \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude 'node_modules/' \
-            --exclude '.next/' \
-            --exclude 'backend/public/posts/' \
-            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new" \
-            ./ "$SERVER_USER@$SERVER_HOST:$APP_DIR/"
+          tar \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='backend/public/posts' \
+            -czf - . | ssh -i ~/.ssh/id_rsa \
+            -o StrictHostKeyChecking=accept-new \
+            "$SERVER_USER@$SERVER_HOST" \
+            "tar -xzf - -C '$APP_DIR'"
 
       - name: Run deployment script
         shell: bash
