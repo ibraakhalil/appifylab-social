@@ -13,6 +13,7 @@ jobs:
 
     env:
       APP_DIR: /home/ubuntu/appifylab-social
+      NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL || secrets.NEXT_PUBLIC_API_BASE_URL }}
       SERVER_HOST: ${{ secrets.SERVER_HOST }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
 
@@ -29,6 +30,7 @@ jobs:
           test -n "$SERVER_USER" || { echo "SERVER_USER secret is required."; exit 1; }
           test -n "${{ secrets.SERVER_SSH_KEY }}" || { echo "SERVER_SSH_KEY secret is required."; exit 1; }
           test -n "${{ secrets.BACKEND_ENV_FILE }}" || { echo "BACKEND_ENV_FILE secret is required."; exit 1; }
+          test -n "$NEXT_PUBLIC_API_BASE_URL" || { echo "NEXT_PUBLIC_API_BASE_URL variable or secret is required."; exit 1; }
 
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
@@ -71,12 +73,17 @@ jobs:
           ssh -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=accept-new \
             "$SERVER_USER@$SERVER_HOST" \
-            "mkdir -p '$APP_DIR/backend'"
+            "mkdir -p '$APP_DIR/backend' '$APP_DIR/frontend'"
 
           printf '%s\n' "${{ secrets.BACKEND_ENV_FILE }}" | ssh -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=accept-new \
             "$SERVER_USER@$SERVER_HOST" \
             "umask 077 && cat > '$APP_DIR/backend/.env'"
+
+          printf 'NEXT_PUBLIC_API_BASE_URL=%s\n' "$NEXT_PUBLIC_API_BASE_URL" | ssh -i ~/.ssh/id_rsa \
+            -o StrictHostKeyChecking=accept-new \
+            "$SERVER_USER@$SERVER_HOST" \
+            "umask 077 && cat > '$APP_DIR/frontend/.env.production'"
 
       - name: Run deployment script
         shell: bash

@@ -33,6 +33,16 @@ if ! grep -Eq '^JWT_SECRET=.+' "$ROOT_DIR/backend/.env"; then
   exit 1
 fi
 
+if [[ ! -f "$ROOT_DIR/frontend/.env.production" ]]; then
+  echo "Missing $ROOT_DIR/frontend/.env.production"
+  exit 1
+fi
+
+if ! grep -Eq '^NEXT_PUBLIC_API_BASE_URL=.+' "$ROOT_DIR/frontend/.env.production"; then
+  echo "frontend/.env.production must define NEXT_PUBLIC_API_BASE_URL"
+  exit 1
+fi
+
 mkdir -p "$ROOT_DIR/backend/public/posts"
 
 cd "$ROOT_DIR/backend"
