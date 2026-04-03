@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: appifylab-social-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_DIR: /home/ubuntu/appifylab-social
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          PORT="${SERVER_PORT:-22}"
+          ssh-keyscan -p "$PORT" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Ensure application directory exists
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          PORT="${SERVER_PORT:-22}"
+          ssh -p "$PORT" "$SERVER_USER@$SERVER_HOST" "mkdir -p '$APP_DIR'"
+
+      - name: Sync repository to server
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          PORT="${SERVER_PORT:-22}"
+
+          rsync -az \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'node_modules/' \
+            --exclude '.next/' \
+            --exclude 'backend/public/posts/' \
+            -e "ssh -p $PORT" \
+            ./ "$SERVER_USER@$SERVER_HOST:$APP_DIR/"
+
+      - name: Run deployment script
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          PORT="${SERVER_PORT:-22}"
+          ssh -p "$PORT" "$SERVER_USER@$SERVER_HOST" "cd '$APP_DIR' && chmod +x scripts/deploy.sh && ./scripts/deploy.sh"
