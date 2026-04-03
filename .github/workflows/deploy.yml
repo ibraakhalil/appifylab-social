@@ -19,6 +19,7 @@ jobs:
       SERVER_HOST: ${{ secrets.SERVER_HOST }}
       SERVER_PORT: ${{ secrets.SERVER_PORT }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
+      SSH_HOST_ALIAS: deploy-target
 
     steps:
       - name: Checkout repository
@@ -29,27 +30,41 @@ jobs:
         run: |
           set -Eeuo pipefail
 
+          test -n "$SERVER_HOST" || { echo "SERVER_HOST secret is required."; exit 1; }
+          test -n "$SERVER_USER" || { echo "SERVER_USER secret is required."; exit 1; }
+          test -n "${{ secrets.SERVER_SSH_KEY }}" || { echo "SERVER_SSH_KEY secret is required."; exit 1; }
+
           mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
           PORT="${SERVER_PORT:-22}"
-          ssh-keyscan -p "$PORT" -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+
+          cat > ~/.ssh/config <<EOF
+          Host $SSH_HOST_ALIAS
+            HostName $SERVER_HOST
+            User $SERVER_USER
+            Port $PORT
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking accept-new
+            ServerAliveInterval 30
+            ServerAliveCountMax 6
+          EOF
+
+          chmod 600 ~/.ssh/config
+          ssh -o BatchMode=yes "$SSH_HOST_ALIAS" "exit 0"
 
       - name: Ensure application directory exists
         shell: bash
         run: |
           set -Eeuo pipefail
 
-          PORT="${SERVER_PORT:-22}"
-          ssh -p "$PORT" "$SERVER_USER@$SERVER_HOST" "mkdir -p '$APP_DIR'"
+          ssh "$SSH_HOST_ALIAS" "mkdir -p '$APP_DIR'"
 
       - name: Sync repository to server
         shell: bash
         run: |
           set -Eeuo pipefail
-
-          PORT="${SERVER_PORT:-22}"
 
           rsync -az \
             --exclude '.git/' \
@@ -57,13 +72,12 @@ jobs:
             --exclude 'node_modules/' \
             --exclude '.next/' \
             --exclude 'backend/public/posts/' \
-            -e "ssh -p $PORT" \
-            ./ "$SERVER_USER@$SERVER_HOST:$APP_DIR/"
+            -e "ssh" \
+            ./ "$SSH_HOST_ALIAS:$APP_DIR/"
 
       - name: Run deployment script
         shell: bash
         run: |
           set -Eeuo pipefail
 
-          PORT="${SERVER_PORT:-22}"
-          ssh -p "$PORT" "$SERVER_USER@$SERVER_HOST" "cd '$APP_DIR' && chmod +x scripts/deploy.sh && ./scripts/deploy.sh"
+          ssh "$SSH_HOST_ALIAS" "cd '$APP_DIR' && chmod +x scripts/deploy.sh && ./scripts/deploy.sh"
