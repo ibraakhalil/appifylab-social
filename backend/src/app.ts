@@ -13,6 +13,7 @@ import repliesRoutes from "@/routes/replies";
 import usersRoutes from "@/routes/users";
 
 const app = new Hono<AppEnv>();
+const apiV1 = new Hono<AppEnv>();
 
 app.use(
   "/public/*",
@@ -35,6 +36,8 @@ app.use(
 app.get("/", (c) =>
   c.json({
     message: "AppifyLab Social API is running.",
+    version: "v1",
+    basePath: "/api/v1",
   }),
 );
 
@@ -44,11 +47,19 @@ app.get("/health", (c) =>
   }),
 );
 
-app.route("/auth", authRoutes);
-app.route("/posts", postsRoutes);
-app.route("/comments", commentsRoutes);
-app.route("/replies", repliesRoutes);
-app.route("/users", usersRoutes);
+apiV1.get("/health", (c) =>
+  c.json({
+    status: "ok",
+  }),
+);
+
+apiV1.route("/auth", authRoutes);
+apiV1.route("/posts", postsRoutes);
+apiV1.route("/comments", commentsRoutes);
+apiV1.route("/replies", repliesRoutes);
+apiV1.route("/users", usersRoutes);
+
+app.route("/api/v1", apiV1);
 
 app.notFound((c) => jsonError(c, 404, "Route not found."));
 

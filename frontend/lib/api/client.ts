@@ -1,8 +1,8 @@
 import { readToken } from "@/lib/auth/session";
 import type { ApiErrorResponse } from "@/lib/api/types";
+import { env } from "@/lib/env";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "http://localhost:3001";
+const API_BASE_URL = env.apiBaseUrl;
 
 export class ApiError extends Error {
   constructor(
