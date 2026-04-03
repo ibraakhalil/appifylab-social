@@ -23,6 +23,21 @@ require_command() {
 require_command bun
 require_command pm2
 
+if [[ ! -f "$ROOT_DIR/backend/.env" ]]; then
+  echo "Missing $ROOT_DIR/backend/.env"
+  exit 1
+fi
+
+if [[ ! -f "$ROOT_DIR/frontend/.env" ]]; then
+  echo "Missing $ROOT_DIR/frontend/.env"
+  exit 1
+fi
+
+if ! grep -Eq '^JWT_SECRET=.+' "$ROOT_DIR/backend/.env"; then
+  echo "backend/.env must define JWT_SECRET"
+  exit 1
+fi
+
 mkdir -p "$ROOT_DIR/backend/public/posts"
 
 cd "$ROOT_DIR/backend"
