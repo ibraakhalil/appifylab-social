@@ -22,6 +22,11 @@ export const createPost = ({ formData }: CreatePostInput) =>
     method: "POST",
   });
 
+export const deletePost = (postId: string) =>
+  apiFetch<{ message: string }>(`/posts/${postId}`, {
+    method: "DELETE",
+  });
+
 export const togglePostLike = (postId: string) =>
   apiFetch<{ isLiked: boolean; likeCount: number }>(`/posts/${postId}/like`, {
     method: "POST",

@@ -333,7 +333,11 @@ export default function FeedPostCard(props: FeedPostCardProps) {
               </div>
             </div>
           </div>
-          <PostCardActions canManagePost={canManagePost} />
+          <PostCardActions
+            canManagePost={canManagePost}
+            onUnauthorized={onUnauthorized}
+            postId={post.id}
+          />
         </div>
 
         <div className="mt-4 space-y-4">

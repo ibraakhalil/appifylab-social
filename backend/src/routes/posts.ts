@@ -207,6 +207,33 @@ postsRoutes.post("/", async (c) => {
   );
 });
 
+postsRoutes.delete("/:id", async (c) => {
+  const authUser = c.get("authUser");
+  const postId = c.req.param("id");
+
+  const post = await db.query.posts.findFirst({
+    columns: {
+      authorId: true,
+      id: true,
+    },
+    where: eq(posts.id, postId),
+  });
+
+  if (!post) {
+    throw notFound("Post not found.");
+  }
+
+  if (post.authorId !== authUser.userId) {
+    throw forbidden("You can only delete your own posts.");
+  }
+
+  await db.delete(posts).where(eq(posts.id, postId));
+
+  return c.json({
+    message: "Post deleted successfully.",
+  });
+});
+
 postsRoutes.get("/:id/likes", async (c) => {
   const authUser = c.get("authUser");
   const postId = c.req.param("id");

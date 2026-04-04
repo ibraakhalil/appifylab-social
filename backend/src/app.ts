@@ -27,7 +27,7 @@ app.use(
   "*",
   cors({
     allowHeaders: ["Authorization", "Content-Type"],
-    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowMethods: ["DELETE", "GET", "POST", "OPTIONS"],
     credentials: true,
     origin: env.corsOrigins,
   }),

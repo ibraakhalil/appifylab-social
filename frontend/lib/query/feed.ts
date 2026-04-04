@@ -13,6 +13,7 @@ import {
   createComment,
   createPost,
   createReply,
+  deletePost,
   getComments,
   toggleCommentLike,
   togglePostLike,
@@ -39,6 +40,23 @@ const updateInfiniteFeedData = (
     pages: data.pages.map((page) => ({
       ...page,
       items: page.items.map((post) => (post.id === postId ? update(post) : post)),
+    })),
+  };
+};
+
+const removeFromInfiniteFeedData = (
+  data: InfiniteData<FeedResponse, string | null> | undefined,
+  postId: string,
+) => {
+  if (!data) {
+    return data;
+  }
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      items: page.items.filter((post) => post.id !== postId),
     })),
   };
 };
@@ -94,6 +112,13 @@ const updateFeedLists = (
   queryClient.setQueriesData<InfiniteData<FeedResponse, string | null>>(
     { queryKey: feedKeys.lists() },
     (current) => updateInfiniteFeedData(current, postId, update),
+  );
+};
+
+const removePostFromFeedLists = (queryClient: ReturnType<typeof useQueryClient>, postId: string) => {
+  queryClient.setQueriesData<InfiniteData<FeedResponse, string | null>>(
+    { queryKey: feedKeys.lists() },
+    (current) => removeFromInfiniteFeedData(current, postId),
   );
 };
 
@@ -183,6 +208,29 @@ export const useCreatePostMutation = ({ onUnauthorized }: { onUnauthorized: () =
       }
     },
     onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: feedKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: profileKeys.all }),
+      ]);
+    },
+  });
+};
+
+export const useDeletePostMutation = ({ onUnauthorized }: { onUnauthorized: () => void }) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ message: string }, Error, string>({
+    mutationFn: (postId: string) => deletePost(postId),
+    onError: (error) => {
+      if (isUnauthorizedApiError(error)) {
+        onUnauthorized();
+      }
+    },
+    onSuccess: async (_response, postId) => {
+      removePostFromFeedLists(queryClient, postId);
+      queryClient.removeQueries({ queryKey: feedKeys.comments(postId) });
+      queryClient.removeQueries({ queryKey: feedKeys.postReactions(postId) });
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: feedKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: profileKeys.all }),
