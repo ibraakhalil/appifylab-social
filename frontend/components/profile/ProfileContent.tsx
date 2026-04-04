@@ -90,7 +90,7 @@ export default function ProfileContent({
             <div className="flex items-start gap-4">
               <Avatar name={currentUserName} className="h-16 w-16 shrink-0 text-xl" />
               <div className="min-w-0">
-                <p className="text-subtle text-xs font-medium uppercase tracking-[0.16em]">
+                <p className="text-subtle text-xs font-medium tracking-[0.16em] uppercase">
                   {profileLabel}
                 </p>
                 <h1 className="text-ink mt-1 text-2xl font-semibold">
@@ -131,6 +131,7 @@ export default function ProfileContent({
       </section>
 
       <FeedTimeline
+        currentUserId={sessionUser?.id}
         currentUserName={currentUserName}
         emptyStateMessage={emptyStateMessage}
         loadPosts={(cursor?: string | null) =>

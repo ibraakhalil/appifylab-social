@@ -75,6 +75,7 @@ export default function FeedTimeline({
 
       <Virtuoso
         useWindowScroll
+        initialItemCount={posts.length > 1 ? 2 : posts.length}
         data={posts}
         computeItemKey={(_index, post) => post.id}
         endReached={() => {

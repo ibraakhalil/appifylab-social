@@ -128,7 +128,7 @@ export default function FeedSkeleton({
 
   return (
     <div
-      className="space-y-6 pb-4"
+      className="space-y-6 py-4"
       style={
         shouldFillViewport
           ? { minHeight: "calc(100vh - var(--header-height) - var(--layout-offset))" }
