@@ -3,15 +3,8 @@
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { useAuth } from "@/hooks/useAuth";
-import {
-  getMyProfile,
-  getMyProfilePosts,
-  getUserProfile,
-  getUserProfilePosts,
-} from "@/lib/api/profile";
-
 import FeedLoadingState from "@/components/feed/FeedLoadingState";
+import { useAuth } from "@/hooks/useAuth";
 
 import ProfileContent from "./ProfileContent";
 
@@ -38,16 +31,6 @@ export default function ProfileContainer({ userId }: ProfileContainerProps) {
     }
   }, [isAuthenticated, isReady, router]);
 
-  const loadProfile = useCallback(
-    () => (userId ? getUserProfile(userId) : getMyProfile()),
-    [userId],
-  );
-  const loadPosts = useCallback(
-    (cursor?: string | null) =>
-      userId ? getUserProfilePosts(userId, cursor) : getMyProfilePosts(cursor),
-    [userId],
-  );
-
   if (!isReady || !isAuthenticated) {
     return <FeedLoadingState />;
   }
@@ -57,10 +40,9 @@ export default function ProfileContainer({ userId }: ProfileContainerProps) {
       emptyStateMessage={
         userId ? "No public posts to show yet." : "You have not published any posts yet."
       }
-      loadPosts={loadPosts}
-      loadProfile={loadProfile}
       onUnauthorized={handleUnauthorized}
       sessionUser={user}
+      userId={userId}
     />
   );
 }

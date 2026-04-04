@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
@@ -12,17 +12,8 @@ export default function FeedContainer() {
   const router = useRouter();
   const { isAuthenticated, isReady, logout, user } = useAuth();
 
-  const handleUnauthorized = useCallback(() => {
-    logout();
-    router.replace("/login");
-  }, [logout, router]);
-
   useEffect(() => {
-    if (!isReady) {
-      return;
-    }
-
-    if (!isAuthenticated) {
+    if (isReady && !isAuthenticated) {
       router.replace("/login");
     }
   }, [isAuthenticated, isReady, router]);
@@ -31,5 +22,13 @@ export default function FeedContainer() {
     return <FeedSkeleton />;
   }
 
-  return <FeedContent onUnauthorized={handleUnauthorized} user={user} />;
+  return (
+    <FeedContent
+      onUnauthorized={() => {
+        logout();
+        router.replace("/login");
+      }}
+      user={user}
+    />
+  );
 }

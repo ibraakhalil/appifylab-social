@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { useState } from "react";
 
-import { ApiError } from "@/lib/api/client";
-import { getCommentLikes, getReplyLikes } from "@/lib/api/posts";
 import Avatar from "@/components/ui/Avatar";
-import type { ApiUser, CommentItem, ReplyItem } from "@/lib/api/types";
+import { getCommentLikes, getReplyLikes } from "@/lib/api/posts";
+import type { CommentItem, ReplyItem } from "@/lib/api/types";
+import { useReactionUsersQuery } from "@/lib/query/feed";
+import { feedKeys } from "@/lib/query/keys";
+import { isUnauthorizedApiError } from "@/lib/query/utils";
 
 import ReactionUsersDialog from "./ReactionUsersDialog";
 import { buildProfileHref, formatRelativeTime } from "./feedUtils";
@@ -12,104 +16,131 @@ import { buildProfileHref, formatRelativeTime } from "./feedUtils";
 type CommentThreadProps = {
   activeReplyId: string | null;
   comment: CommentItem;
-  onUnauthorized: () => void;
   onReplyChange: (commentId: string, value: string) => void;
   onReplyLikeToggle: (replyId: string) => Promise<void>;
   onReplySubmit: (commentId: string) => Promise<void>;
   onToggleLike: (commentId: string) => Promise<void>;
+  onUnauthorized: () => void;
   replyDrafts: Record<string, string>;
+  replySubmitPendingId: string | null;
 };
 
+type ThreadCardProps = {
+  actionLabel?: string;
+  avatarClassName: string;
+  content: string;
+  createdAt: string;
+  isLiked: boolean;
+  likeCount: number;
+  onActionClick?: () => void;
+  onLikeClick: () => void;
+  onReactionDialogChange: (open: boolean) => void;
+  profileId: string;
+  profileName: string;
+};
+
+function ThreadCard({
+  actionLabel,
+  avatarClassName,
+  content,
+  createdAt,
+  isLiked,
+  likeCount,
+  onActionClick,
+  onLikeClick,
+  onReactionDialogChange,
+  profileId,
+  profileName,
+}: ThreadCardProps) {
+  return (
+    <div className="flex items-start gap-3">
+      <Link href={buildProfileHref(profileId)} className="shrink-0">
+        <Avatar name={profileName} className={avatarClassName} />
+      </Link>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={buildProfileHref(profileId)}
+            className="text-ink hover:text-accent text-sm font-semibold transition"
+          >
+            {profileName}
+          </Link>
+          <span className="text-muted text-xs">{formatRelativeTime(createdAt)}</span>
+        </div>
+        <p className="text-muted mt-2 text-sm leading-6">{content}</p>
+        <div className="text-muted mt-3 flex flex-wrap items-center gap-4 text-xs font-medium">
+          <button
+            type="button"
+            onClick={() => void onLikeClick()}
+            className={`transition ${isLiked ? "text-accent" : "hover:text-ink"}`}
+          >
+            Like
+          </button>
+          <button
+            type="button"
+            onClick={() => onReactionDialogChange(true)}
+            className="hover:text-ink transition"
+          >
+            {likeCount} reactions
+          </button>
+          {actionLabel && onActionClick ? (
+            <button type="button" onClick={onActionClick} className="hover:text-ink transition">
+              {actionLabel}
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ReplyCard({
+  onToggleLike,
   onUnauthorized,
   reply,
-  onToggleLike,
 }: {
-  onUnauthorized: () => void;
   onToggleLike: (replyId: string) => Promise<void>;
+  onUnauthorized: () => void;
   reply: ReplyItem;
 }) {
-  const [isReactionDialogOpen, setIsReactionDialogOpen] = useState(false);
-  const [isReactionsLoading, setIsReactionsLoading] = useState(false);
-  const [reactionError, setReactionError] = useState<string | null>(null);
-  const [reactions, setReactions] = useState<ApiUser[]>([]);
-
-  const handleReactionDialogChange = async (open: boolean) => {
-    setIsReactionDialogOpen(open);
-
-    if (!open || reactions.length || isReactionsLoading) {
-      return;
-    }
-
-    setIsReactionsLoading(true);
-    setReactionError(null);
-
-    try {
-      const response = await getReplyLikes(reply.id);
-      setReactions(response.items);
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        onUnauthorized();
-        return;
-      }
-
-      setReactionError(error instanceof Error ? error.message : "Unable to load reactions.");
-    } finally {
-      setIsReactionsLoading(false);
-    }
-  };
+  const [isOpen, setIsOpen] = useState(false);
+  const reactionsQuery = useReactionUsersQuery({
+    enabled: isOpen,
+    loadUsers: () => getReplyLikes(reply.id),
+    onUnauthorized,
+    queryKey: feedKeys.replyReactions(reply.id),
+  });
+  const error =
+    reactionsQuery.error && !isUnauthorizedApiError(reactionsQuery.error)
+      ? reactionsQuery.error instanceof Error
+        ? reactionsQuery.error.message
+        : "Unable to load reactions."
+      : null;
 
   return (
     <>
       <div className="rounded-3xl bg-white p-4 shadow-sm">
-        <div className="flex items-start gap-3">
-          <Link href={buildProfileHref(reply.author.id)} className="shrink-0">
-            <Avatar
-              name={`${reply.author.firstName} ${reply.author.lastName}`}
-              className="h-9 w-9 text-sm"
-            />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <Link
-                href={buildProfileHref(reply.author.id)}
-                className="text-ink hover:text-accent text-sm font-semibold transition"
-              >
-                {reply.author.firstName} {reply.author.lastName}
-              </Link>
-              <span className="text-muted text-xs">{formatRelativeTime(reply.createdAt)}</span>
-            </div>
-            <p className="text-muted mt-2 text-sm leading-6">{reply.content}</p>
-            <div className="text-muted mt-3 flex flex-wrap items-center gap-4 text-xs font-medium">
-              <button
-                type="button"
-                onClick={() => void onToggleLike(reply.id)}
-                className={`transition ${reply.isLiked ? "text-accent" : "hover:text-ink"}`}
-              >
-                Like
-              </button>
-              <button
-                type="button"
-                onClick={() => void handleReactionDialogChange(true)}
-                className="hover:text-ink transition"
-              >
-                {reply.likeCount} reactions
-              </button>
-            </div>
-          </div>
-        </div>
+        <ThreadCard
+          avatarClassName="h-9 w-9 text-sm"
+          content={reply.content}
+          createdAt={reply.createdAt}
+          isLiked={reply.isLiked}
+          likeCount={reply.likeCount}
+          onLikeClick={() => onToggleLike(reply.id)}
+          onReactionDialogChange={setIsOpen}
+          profileId={reply.author.id}
+          profileName={`${reply.author.firstName} ${reply.author.lastName}`}
+        />
       </div>
 
       <ReactionUsersDialog
         description="People who reacted to this reply."
-        error={reactionError}
-        isLoading={isReactionsLoading}
-        onOpenChange={(open) => {
-          void handleReactionDialogChange(open);
-        }}
-        open={isReactionDialogOpen}
+        error={error}
+        isLoading={reactionsQuery.isLoading || reactionsQuery.isFetching}
+        onOpenChange={setIsOpen}
+        open={isOpen}
         title="Reply reactions"
-        users={reactions}
+        users={reactionsQuery.data ?? []}
       />
     </>
   );
@@ -118,90 +149,45 @@ function ReplyCard({
 export default function CommentThread({
   activeReplyId,
   comment,
-  onUnauthorized,
   onReplyChange,
   onReplyLikeToggle,
   onReplySubmit,
   onToggleLike,
+  onUnauthorized,
   replyDrafts,
+  replySubmitPendingId,
 }: CommentThreadProps) {
-  const [isReactionDialogOpen, setIsReactionDialogOpen] = useState(false);
-  const [isReactionsLoading, setIsReactionsLoading] = useState(false);
-  const [reactionError, setReactionError] = useState<string | null>(null);
-  const [reactions, setReactions] = useState<ApiUser[]>([]);
-
-  const handleReactionDialogChange = async (open: boolean) => {
-    setIsReactionDialogOpen(open);
-
-    if (!open || reactions.length || isReactionsLoading) {
-      return;
-    }
-
-    setIsReactionsLoading(true);
-    setReactionError(null);
-
-    try {
-      const response = await getCommentLikes(comment.id);
-      setReactions(response.items);
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        onUnauthorized();
-        return;
-      }
-
-      setReactionError(error instanceof Error ? error.message : "Unable to load reactions.");
-    } finally {
-      setIsReactionsLoading(false);
-    }
-  };
+  const [isOpen, setIsOpen] = useState(false);
+  const reactionsQuery = useReactionUsersQuery({
+    enabled: isOpen,
+    loadUsers: () => getCommentLikes(comment.id),
+    onUnauthorized,
+    queryKey: feedKeys.commentReactions(comment.id),
+  });
+  const error =
+    reactionsQuery.error && !isUnauthorizedApiError(reactionsQuery.error)
+      ? reactionsQuery.error instanceof Error
+        ? reactionsQuery.error.message
+        : "Unable to load reactions."
+      : null;
 
   return (
     <>
       <div className="space-y-3">
         <div className="bg-surface-muted rounded-3xl p-4">
-          <div className="flex items-start gap-3">
-            <Link href={buildProfileHref(comment.author.id)} className="shrink-0">
-              <Avatar
-                name={`${comment.author.firstName} ${comment.author.lastName}`}
-                className="h-10 w-10 text-sm"
-              />
-            </Link>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  href={buildProfileHref(comment.author.id)}
-                  className="text-ink hover:text-accent text-sm font-semibold transition"
-                >
-                  {comment.author.firstName} {comment.author.lastName}
-                </Link>
-                <span className="text-muted text-xs">{formatRelativeTime(comment.createdAt)}</span>
-              </div>
-              <p className="text-muted mt-2 text-sm leading-6">{comment.content}</p>
-              <div className="text-muted mt-3 flex flex-wrap items-center gap-4 text-xs font-medium">
-                <button
-                  type="button"
-                  onClick={() => void onToggleLike(comment.id)}
-                  className={`transition ${comment.isLiked ? "text-accent" : "hover:text-ink"}`}
-                >
-                  Like
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleReactionDialogChange(true)}
-                  className="hover:text-ink transition"
-                >
-                  {comment.likeCount} reactions
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onReplyChange(comment.id, replyDrafts[comment.id] ?? "")}
-                  className="hover:text-ink transition"
-                >
-                  Reply
-                </button>
-              </div>
-            </div>
-          </div>
+          <ThreadCard
+            actionLabel="Reply"
+            avatarClassName="h-10 w-10 text-sm"
+            content={comment.content}
+            createdAt={comment.createdAt}
+            isLiked={comment.isLiked}
+            likeCount={comment.likeCount}
+            onActionClick={() => onReplyChange(comment.id, replyDrafts[comment.id] ?? "")}
+            onLikeClick={() => onToggleLike(comment.id)}
+            onReactionDialogChange={setIsOpen}
+            profileId={comment.author.id}
+            profileName={`${comment.author.firstName} ${comment.author.lastName}`}
+          />
         </div>
 
         {activeReplyId === comment.id ? (
@@ -220,9 +206,10 @@ export default function CommentThread({
             />
             <button
               type="submit"
-              className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition"
+              disabled={replySubmitPendingId === comment.id}
+              className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Reply
+              {replySubmitPendingId === comment.id ? "Replying..." : "Reply"}
             </button>
           </form>
         ) : null}
@@ -232,9 +219,9 @@ export default function CommentThread({
             {comment.replies.map((reply) => (
               <ReplyCard
                 key={reply.id}
+                onToggleLike={onReplyLikeToggle}
                 onUnauthorized={onUnauthorized}
                 reply={reply}
-                onToggleLike={onReplyLikeToggle}
               />
             ))}
           </div>
@@ -243,14 +230,12 @@ export default function CommentThread({
 
       <ReactionUsersDialog
         description="People who reacted to this comment."
-        error={reactionError}
-        isLoading={isReactionsLoading}
-        onOpenChange={(open) => {
-          void handleReactionDialogChange(open);
-        }}
-        open={isReactionDialogOpen}
+        error={error}
+        isLoading={reactionsQuery.isLoading || reactionsQuery.isFetching}
+        onOpenChange={setIsOpen}
+        open={isOpen}
         title="Comment reactions"
-        users={reactions}
+        users={reactionsQuery.data ?? []}
       />
     </>
   );

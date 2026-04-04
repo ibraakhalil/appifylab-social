@@ -1,21 +1,21 @@
 "use client";
 
-import { startTransition, useCallback, useEffect, useState } from "react";
 import { CalendarDays, Mail } from "lucide-react";
 
 import FeedLoadingState from "@/components/feed/FeedLoadingState";
 import FeedTimeline from "@/components/feed/FeedTimeline";
 import Avatar from "@/components/ui/Avatar";
-import { ApiError } from "@/lib/api/client";
-import type { FeedResponse, ProfileResponse } from "@/lib/api/types";
+import { getMyProfilePosts, getUserProfilePosts } from "@/lib/api/profile";
 import type { SessionUser } from "@/lib/auth/session";
+import { feedKeys } from "@/lib/query/keys";
+import { useProfileQuery } from "@/lib/query/profile";
+import { isUnauthorizedApiError } from "@/lib/query/utils";
 
 type ProfileContentProps = {
   emptyStateMessage: string;
-  loadPosts: (cursor?: string | null) => Promise<FeedResponse>;
-  loadProfile: () => Promise<ProfileResponse>;
   onUnauthorized: () => void;
   sessionUser: SessionUser | null;
+  userId?: string;
 };
 
 const formatMemberSince = (value: string) =>
@@ -30,38 +30,26 @@ const formatCountLabel = (value: number, singular: string, plural = `${singular}
 
 export default function ProfileContent({
   emptyStateMessage,
-  loadPosts,
-  loadProfile,
   onUnauthorized,
   sessionUser,
+  userId,
 }: ProfileContentProps) {
-  const [profile, setProfile] = useState<ProfileResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const profileQuery = useProfileQuery({
+    onUnauthorized,
+    userId,
+  });
 
-  const loadProfileData = useCallback(async () => {
-    try {
-      const response = await loadProfile();
-      setProfile(response);
-      setError(null);
-    } catch (loadError) {
-      if (loadError instanceof ApiError && loadError.status === 401) {
-        onUnauthorized();
-        return;
-      }
-
-      setError(loadError instanceof Error ? loadError.message : "Unable to load profile.");
-    }
-  }, [loadProfile, onUnauthorized]);
-
-  useEffect(() => {
-    startTransition(() => {
-      void loadProfileData();
-    });
-  }, [loadProfileData]);
-
-  if (!profile && !error) {
+  if (profileQuery.isPending) {
     return <FeedLoadingState />;
   }
+
+  const profile = profileQuery.data;
+  const error =
+    profileQuery.error && !isUnauthorizedApiError(profileQuery.error)
+      ? profileQuery.error instanceof Error
+        ? profileQuery.error.message
+        : "Unable to load profile."
+      : null;
 
   if (!profile) {
     return (
@@ -147,9 +135,11 @@ export default function ProfileContent({
           currentUserName={currentUserName}
           emptyStateMessage={emptyStateMessage}
           loadMoreLabel={profile.isCurrentUser ? "Load more of your posts" : "Load more posts"}
-          loadPosts={loadPosts}
+          loadPosts={(cursor?: string | null) =>
+            userId ? getUserProfilePosts(userId, cursor) : getMyProfilePosts(cursor)
+          }
           onUnauthorized={onUnauthorized}
-          refreshKey={0}
+          queryKey={feedKeys.profile(userId)}
         />
       </section>
     </div>

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { ApiError } from "@/lib/api/client";
-import { createPost } from "@/lib/api/posts";
+import { useCreatePostMutation } from "@/lib/query/feed";
+import { isUnauthorizedApiError } from "@/lib/query/utils";
 
 import FeedComposer, { type FeedComposerState } from "./FeedComposer";
 
@@ -23,19 +23,17 @@ const revokePreviewUrl = (previewUrl: string) => {
 type FeedComposerSectionProps = {
   currentUserFirstName: string;
   currentUserName: string;
-  onPostCreated: () => void;
   onUnauthorized: () => void;
 };
 
 export default function FeedComposerSection({
   currentUserFirstName,
   currentUserName,
-  onPostCreated,
   onUnauthorized,
 }: FeedComposerSectionProps) {
   const [composer, setComposer] = useState<FeedComposerState>(initialComposerState);
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const createPostMutation = useCreatePostMutation({ onUnauthorized });
 
   useEffect(
     () => () => {
@@ -44,27 +42,34 @@ export default function FeedComposerSection({
     [composer.imagePreviewUrl],
   );
 
+  const resetMutationState = () => {
+    setValidationError(null);
+    createPostMutation.reset();
+  };
+
   const updateComposer = (updater: (current: FeedComposerState) => FeedComposerState) => {
     setComposer((current) => updater(current));
-    setError(null);
+    resetMutationState();
   };
 
   const handleImageChange = (file: File | null) => {
-    setComposer((current) => ({
-      ...current,
-      imageFile: file,
-      imagePreviewUrl: file ? URL.createObjectURL(file) : "",
-    }));
-    setError(null);
+    setComposer((current) => {
+      revokePreviewUrl(current.imagePreviewUrl);
+
+      return {
+        ...current,
+        imageFile: file,
+        imagePreviewUrl: file ? URL.createObjectURL(file) : "",
+      };
+    });
+    resetMutationState();
   };
 
   const handleCreatePost = async () => {
     if (!composer.contentText.trim() && !composer.imageFile) {
-      setError("Write something or choose a photo before posting.");
+      setValidationError("Write something or choose a photo before posting.");
       return;
     }
-
-    setIsSubmitting(true);
 
     try {
       const formData = new FormData();
@@ -79,24 +84,24 @@ export default function FeedComposerSection({
 
       formData.set("visibility", composer.visibility);
 
-      await createPost({ formData });
+      await createPostMutation.mutateAsync({ formData });
 
-      setComposer({ ...initialComposerState });
-      setError(null);
-      onPostCreated();
+      setComposer(initialComposerState);
+      resetMutationState();
     } catch (submissionError) {
-      if (submissionError instanceof ApiError && submissionError.status === 401) {
-        onUnauthorized();
+      if (isUnauthorizedApiError(submissionError)) {
         return;
       }
 
-      setError(
+      setValidationError(
         submissionError instanceof Error ? submissionError.message : "Unable to create post.",
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
+
+  const error =
+    validationError ??
+    (createPostMutation.error instanceof Error ? createPostMutation.error.message : null);
 
   return (
     <FeedComposer
@@ -104,7 +109,7 @@ export default function FeedComposerSection({
       currentUserFirstName={currentUserFirstName}
       currentUserName={currentUserName}
       error={error}
-      isSubmitting={isSubmitting}
+      isSubmitting={createPostMutation.isPending}
       onContentTextChange={(value) =>
         updateComposer((current) => ({
           ...current,

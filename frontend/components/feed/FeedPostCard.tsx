@@ -1,6 +1,9 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   Globe2,
   LoaderCircle,
@@ -11,61 +14,254 @@ import {
   ThumbsUp,
 } from "lucide-react";
 
-import type { ApiUser, CommentItem, FeedPost } from "@/lib/api/types";
+import CommentThread from "@/components/feed/CommentThread";
+import ReactionUsersDialog from "@/components/feed/ReactionUsersDialog";
 import Avatar from "@/components/ui/Avatar";
+import { getPostLikes } from "@/lib/api/posts";
+import type { FeedPost } from "@/lib/api/types";
+import {
+  useCreateCommentMutation,
+  useCreateReplyMutation,
+  usePostCommentsQuery,
+  useReactionUsersQuery,
+  useToggleCommentLikeMutation,
+  useTogglePostLikeMutation,
+  useToggleReplyLikeMutation,
+} from "@/lib/query/feed";
+import { feedKeys } from "@/lib/query/keys";
+import { isUnauthorizedApiError } from "@/lib/query/utils";
 
-import CommentThread from "./CommentThread";
-import ReactionUsersDialog from "./ReactionUsersDialog";
 import { buildProfileHref, formatRelativeTime } from "./feedUtils";
 
 type FeedPostCardProps = {
-  activeReplyId: string | null;
-  commentDraft: string;
-  comments: CommentItem[];
   currentUserName: string;
-  isCommentsLoading: boolean;
-  isExpanded: boolean;
-  isReactionsLoading: boolean;
-  onCommentDraftChange: (value: string) => void;
-  onCommentLikeToggle: (commentId: string) => Promise<void>;
-  onCommentSubmit: () => Promise<void>;
-  onLike: () => void;
-  onReplyLikeToggle: (replyId: string) => Promise<void>;
-  onReplyDraftChange: (commentId: string, value: string) => void;
-  onReplySubmit: (commentId: string) => Promise<void>;
-  onToggleComments: () => void;
   onUnauthorized: () => void;
-  onReactionDialogChange: (open: boolean) => void;
   post: FeedPost;
-  reactions: ApiUser[];
-  replyDrafts: Record<string, string>;
-  showReactionDialog: boolean;
 };
 
-export default function FeedPostCard({
-  activeReplyId,
-  commentDraft,
-  comments,
-  currentUserName,
-  isCommentsLoading,
-  isExpanded,
-  isReactionsLoading,
-  onCommentDraftChange,
-  onCommentLikeToggle,
-  onCommentSubmit,
-  onLike,
-  onReplyLikeToggle,
-  onReplyDraftChange,
-  onReplySubmit,
-  onToggleComments,
-  onUnauthorized,
-  onReactionDialogChange,
-  post,
-  reactions,
-  replyDrafts,
-  showReactionDialog,
-}: FeedPostCardProps) {
+const getErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
+
+function useFeedPostCard({ onUnauthorized, post }: FeedPostCardProps) {
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+  const [commentDraft, setCommentDraft] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const [showReactionDialog, setShowReactionDialog] = useState(false);
+  const [submittingReplyId, setSubmittingReplyId] = useState<string | null>(null);
+
+  const commentsQuery = usePostCommentsQuery({
+    enabled: isExpanded,
+    onUnauthorized,
+    postId: post.id,
+  });
+  const reactionsQuery = useReactionUsersQuery({
+    enabled: showReactionDialog,
+    loadUsers: () => getPostLikes(post.id),
+    onUnauthorized,
+    queryKey: feedKeys.postReactions(post.id),
+  });
+  const togglePostLikeMutation = useTogglePostLikeMutation({ onUnauthorized });
+  const createCommentMutation = useCreateCommentMutation({ onUnauthorized });
+  const createReplyMutation = useCreateReplyMutation({ onUnauthorized });
+  const toggleCommentLikeMutation = useToggleCommentLikeMutation({ onUnauthorized });
+  const toggleReplyLikeMutation = useToggleReplyLikeMutation({ onUnauthorized });
+
+  const handleLike = async () => {
+    if (togglePostLikeMutation.isPending) {
+      return;
+    }
+
+    setError(null);
+
+    try {
+      await togglePostLikeMutation.mutateAsync(post.id);
+    } catch (mutationError) {
+      if (isUnauthorizedApiError(mutationError)) {
+        return;
+      }
+
+      setError(getErrorMessage(mutationError, "Unable to update like."));
+    }
+  };
+
+  const handleToggleComments = () => {
+    setIsExpanded((current) => !current);
+    setActiveReplyId(null);
+  };
+
+  const handleReactionDialogChange = (open: boolean) => {
+    setShowReactionDialog(open);
+  };
+
+  const handleCommentSubmit = async () => {
+    const value = commentDraft.trim();
+
+    if (!value || createCommentMutation.isPending) {
+      return;
+    }
+
+    setError(null);
+
+    try {
+      await createCommentMutation.mutateAsync({
+        input: { content: value },
+        postId: post.id,
+      });
+      setCommentDraft("");
+    } catch (mutationError) {
+      if (isUnauthorizedApiError(mutationError)) {
+        return;
+      }
+
+      setError(getErrorMessage(mutationError, "Unable to add comment."));
+    }
+  };
+
+  const handleReplyDraftChange = (commentId: string, value: string) => {
+    setActiveReplyId(commentId);
+    setReplyDrafts((current) => ({
+      ...current,
+      [commentId]: value,
+    }));
+  };
+
+  const handleReplySubmit = async (commentId: string) => {
+    const value = (replyDrafts[commentId] ?? "").trim();
+
+    if (!value || createReplyMutation.isPending) {
+      return;
+    }
+
+    setSubmittingReplyId(commentId);
+    setError(null);
+
+    try {
+      await createReplyMutation.mutateAsync({
+        commentId,
+        input: { content: value },
+        postId: post.id,
+      });
+
+      setReplyDrafts((current) => ({
+        ...current,
+        [commentId]: "",
+      }));
+      setActiveReplyId(null);
+    } catch (mutationError) {
+      if (isUnauthorizedApiError(mutationError)) {
+        return;
+      }
+
+      setError(getErrorMessage(mutationError, "Unable to add reply."));
+    } finally {
+      setSubmittingReplyId(null);
+    }
+  };
+
+  const handleToggleCommentLike = async (commentId: string) => {
+    setError(null);
+
+    try {
+      await toggleCommentLikeMutation.mutateAsync({
+        commentId,
+        postId: post.id,
+      });
+    } catch (mutationError) {
+      if (isUnauthorizedApiError(mutationError)) {
+        return;
+      }
+
+      setError(getErrorMessage(mutationError, "Unable to update comment like."));
+    }
+  };
+
+  const handleToggleReplyLike = async (replyId: string) => {
+    setError(null);
+
+    try {
+      await toggleReplyLikeMutation.mutateAsync({
+        postId: post.id,
+        replyId,
+      });
+    } catch (mutationError) {
+      if (isUnauthorizedApiError(mutationError)) {
+        return;
+      }
+
+      setError(getErrorMessage(mutationError, "Unable to update reply like."));
+    }
+  };
+
+  const commentsError =
+    commentsQuery.error && !isUnauthorizedApiError(commentsQuery.error)
+      ? getErrorMessage(commentsQuery.error, "Unable to load comments.")
+      : null;
+  const reactionError =
+    reactionsQuery.error && !isUnauthorizedApiError(reactionsQuery.error)
+      ? getErrorMessage(reactionsQuery.error, "Unable to load reactions.")
+      : null;
+
+  return {
+    activeReplyId,
+    commentDraft,
+    comments: commentsQuery.data ?? [],
+    commentsError,
+    error,
+    handleCommentSubmit,
+    handleLike,
+    handleReactionDialogChange,
+    handleReplyDraftChange,
+    handleReplySubmit,
+    handleToggleCommentLike,
+    handleToggleComments,
+    handleToggleReplyLike,
+    isCommentsLoading: commentsQuery.isLoading || commentsQuery.isFetching,
+    isCommentSubmitDisabled: !commentDraft.trim() || createCommentMutation.isPending,
+    isExpanded,
+    isLikePending: togglePostLikeMutation.isPending,
+    isReactionsLoading: reactionsQuery.isLoading || reactionsQuery.isFetching,
+    isReplySubmitting: createReplyMutation.isPending,
+    reactionError,
+    reactions: reactionsQuery.data ?? [],
+    replyDrafts,
+    setCommentDraft,
+    showReactionDialog,
+    submittingReplyId,
+  };
+}
+
+export default function FeedPostCard(props: FeedPostCardProps) {
+  const { currentUserName, onUnauthorized, post } = props;
   const visibilityLabel = post.visibility === "public" ? "Public" : "Private";
+  const {
+    activeReplyId,
+    commentDraft,
+    comments,
+    commentsError,
+    error,
+    handleCommentSubmit,
+    handleLike,
+    handleReactionDialogChange,
+    handleReplyDraftChange,
+    handleReplySubmit,
+    handleToggleCommentLike,
+    handleToggleComments,
+    handleToggleReplyLike,
+    isCommentsLoading,
+    isCommentSubmitDisabled,
+    isExpanded,
+    isLikePending,
+    isReactionsLoading,
+    isReplySubmitting,
+    reactionError,
+    reactions,
+    replyDrafts,
+    setCommentDraft,
+    showReactionDialog,
+    submittingReplyId,
+  } = useFeedPostCard(props);
 
   return (
     <>
@@ -131,7 +327,7 @@ export default function FeedPostCard({
             </span>
             <button
               type="button"
-              onClick={() => onReactionDialogChange(true)}
+              onClick={() => handleReactionDialogChange(true)}
               className="text-ink hover:text-accent font-medium transition"
             >
               {post.likeCount} reactions
@@ -150,7 +346,8 @@ export default function FeedPostCard({
                 : "text-muted hover:bg-surface-muted hover:text-ink"
             }`}
             type="button"
-            onClick={onLike}
+            disabled={isLikePending}
+            onClick={() => void handleLike()}
           >
             <ThumbsUp className="h-4 w-4" />
             {post.isLiked ? "Liked" : "Like"}
@@ -158,7 +355,7 @@ export default function FeedPostCard({
           <button
             className="text-muted hover:bg-surface-muted hover:text-ink flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-medium transition"
             type="button"
-            onClick={onToggleComments}
+            onClick={handleToggleComments}
           >
             <MessageCircle className="h-4 w-4" />
             Comment
@@ -172,29 +369,42 @@ export default function FeedPostCard({
           </button>
         </div>
 
+        {error ? (
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        ) : null}
+
         {isExpanded ? (
           <div className="border-line/70 mt-5 space-y-4 border-t pt-4">
             <form
               className="flex gap-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                void onCommentSubmit();
+                void handleCommentSubmit();
               }}
             >
               <Avatar name={currentUserName} className="h-10 w-10 shrink-0 text-sm" />
               <input
                 value={commentDraft}
-                onChange={(event) => onCommentDraftChange(event.target.value)}
+                onChange={(event) => setCommentDraft(event.target.value)}
                 placeholder="Write a comment..."
                 className="border-line text-ink focus:border-accent/50 h-11 flex-1 rounded-full border bg-white px-4 text-sm outline-none transition"
               />
               <button
                 type="submit"
-                className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition"
+                disabled={isCommentSubmitDisabled}
+                className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Send
+                {isCommentSubmitDisabled && commentDraft.trim() ? "Sending..." : "Send"}
               </button>
             </form>
+
+            {commentsError ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {commentsError}
+              </div>
+            ) : null}
 
             {isCommentsLoading ? (
               <div className="text-muted flex items-center gap-2 text-sm">
@@ -208,12 +418,13 @@ export default function FeedPostCard({
                     key={comment.id}
                     activeReplyId={activeReplyId}
                     comment={comment}
+                    onReplyChange={handleReplyDraftChange}
+                    onReplyLikeToggle={handleToggleReplyLike}
+                    onReplySubmit={handleReplySubmit}
+                    onToggleLike={handleToggleCommentLike}
                     onUnauthorized={onUnauthorized}
-                    onReplyChange={onReplyDraftChange}
-                    onReplyLikeToggle={onReplyLikeToggle}
-                    onReplySubmit={onReplySubmit}
-                    onToggleLike={onCommentLikeToggle}
                     replyDrafts={replyDrafts}
+                    replySubmitPendingId={isReplySubmitting ? submittingReplyId : null}
                   />
                 ))}
               </div>
@@ -226,9 +437,9 @@ export default function FeedPostCard({
 
       <ReactionUsersDialog
         description="People who reacted to this post."
-        error={null}
+        error={reactionError}
         isLoading={isReactionsLoading}
-        onOpenChange={onReactionDialogChange}
+        onOpenChange={handleReactionDialogChange}
         open={showReactionDialog}
         title="Reactions"
         users={reactions}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { createContext, startTransition, useEffect, useState } from "react";
 
 import { loginUser, registerUser, type LoginInput, type RegisterInput } from "@/lib/api/auth";
@@ -24,6 +25,7 @@ type AuthContextValue = {
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<SessionState | null>(null);
   const [isReady, setIsReady] = useState(false);
 
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const applySession = (nextSession: SessionState) => {
     saveSession(nextSession);
+    queryClient.clear();
     setSession(nextSession);
   };
 
@@ -54,6 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     clearSession();
+    queryClient.clear();
     setSession(null);
   };
 
