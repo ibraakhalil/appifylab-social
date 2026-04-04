@@ -1,4 +1,5 @@
 import { mkdirSync } from "node:fs";
+import { unlink } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 
 import { badRequest } from "@/lib/errors";
@@ -56,4 +57,49 @@ export const storePostImage = async (file: File, requestUrl: string) => {
   await Bun.write(filePath, file);
 
   return new URL(imagePath, requestUrl).toString();
+};
+
+const getLocalPostImagePath = (imageUrl: string) => {
+  let pathname: string | null = null;
+
+  try {
+    pathname = new URL(imageUrl).pathname;
+  } catch {
+    pathname = imageUrl.startsWith("/") ? imageUrl : null;
+  }
+
+  if (!pathname || !/^\/public\/posts\/[^/]+$/.test(pathname)) {
+    return null;
+  }
+
+  const filename = pathname.slice("/public/posts/".length);
+
+  return resolve(postImagesDirectory, filename);
+};
+
+export const deletePostImage = async (imageUrl: string | null) => {
+  if (!imageUrl) {
+    return;
+  }
+
+  const imagePath = getLocalPostImagePath(imageUrl);
+
+  if (!imagePath) {
+    return;
+  }
+
+  try {
+    await unlink(imagePath);
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "ENOENT"
+    ) {
+      return;
+    }
+
+    console.error("Failed to delete post image.", error);
+  }
 };

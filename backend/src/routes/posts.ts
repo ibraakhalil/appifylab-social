@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 import { db } from "@/db/client";
@@ -12,7 +12,7 @@ import {
   selectFeedPostColumns,
 } from "@/lib/feed-posts";
 import { sanitizeText } from "@/lib/security";
-import { storePostImage } from "@/lib/uploads";
+import { deletePostImage, storePostImage } from "@/lib/uploads";
 import {
   createCommentSchema,
   createPostSchema,
@@ -215,6 +215,7 @@ postsRoutes.delete("/:id", async (c) => {
     columns: {
       authorId: true,
       id: true,
+      imageUrl: true,
     },
     where: eq(posts.id, postId),
   });
@@ -227,7 +228,40 @@ postsRoutes.delete("/:id", async (c) => {
     throw forbidden("You can only delete your own posts.");
   }
 
-  await db.delete(posts).where(eq(posts.id, postId));
+  await db.transaction(async (tx) => {
+    const postComments = await tx
+      .select({
+        id: comments.id,
+      })
+      .from(comments)
+      .where(eq(comments.postId, postId));
+
+    const commentIds = postComments.map((comment) => comment.id);
+    const postReplies =
+      commentIds.length > 0
+        ? await tx
+            .select({
+              id: replies.id,
+            })
+            .from(replies)
+            .where(inArray(replies.commentId, commentIds))
+        : [];
+    const replyIds = postReplies.map((reply) => reply.id);
+
+    const likeFilters = [
+      and(eq(likes.targetId, postId), eq(likes.targetType, "post")),
+      ...(commentIds.length
+        ? [and(inArray(likes.targetId, commentIds), eq(likes.targetType, "comment"))]
+        : []),
+      ...(replyIds.length
+        ? [and(inArray(likes.targetId, replyIds), eq(likes.targetType, "reply"))]
+        : []),
+    ];
+
+    await tx.delete(likes).where(or(...likeFilters));
+    await tx.delete(posts).where(eq(posts.id, postId));
+  });
+  await deletePostImage(post.imageUrl ?? null);
 
   return c.json({
     message: "Post deleted successfully.",
