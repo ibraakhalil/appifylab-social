@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { suggestedPeople, events } from "@/app/data/mock";
+import { suggestedPeople, events } from "@/data/mock";
 import {
   Bookmark,
   Gamepad2,

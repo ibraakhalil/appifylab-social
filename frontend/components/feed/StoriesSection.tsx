@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Plus } from "lucide-react";
 
-import { stories } from "@/app/data/mock";
+import { stories } from "@/data/mock";
 import Avatar from "@/components/ui/Avatar";
 
 export default function StoriesSection() {

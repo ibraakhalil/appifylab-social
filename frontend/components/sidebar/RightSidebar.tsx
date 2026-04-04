@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { friends } from "@/app/data/mock";
+import { friends } from "@/data/mock";
 import { MessageCircleMore, Search } from "lucide-react";
 
 export default function RightSidebar() {
