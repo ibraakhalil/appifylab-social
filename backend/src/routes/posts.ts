@@ -23,21 +23,6 @@ import {
 import { authMiddleware } from "@/middlewares/auth";
 import type { AppEnv } from "@/types/app";
 
-type CommentNode = {
-  author: {
-    email: string;
-    firstName: string;
-    id: string;
-    lastName: string;
-  };
-  content: string;
-  createdAt: string;
-  id: string;
-  isLiked: boolean;
-  likeCount: number;
-  replies: ReplyNode[];
-};
-
 type ReplyNode = {
   author: {
     email: string;
