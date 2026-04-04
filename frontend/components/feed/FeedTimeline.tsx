@@ -1,19 +1,21 @@
 "use client";
 
 import type { QueryKey } from "@tanstack/react-query";
+import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
+import { Virtuoso } from "react-virtuoso";
 
 import type { FeedResponse } from "@/lib/api/types";
 import { useInfiniteFeedQuery } from "@/lib/query/feed";
 import { isUnauthorizedApiError } from "@/lib/query/utils";
 
-import FeedPostCard from "./FeedPostCard";
+import FeedPostCard, { type FeedPostCardUiState } from "./FeedPostCard";
 import FeedSkeleton from "./FeedSkeleton";
 
 type FeedTimelineProps = {
   currentUserName: string;
   emptyStateMessage?: string;
   loadPosts: (cursor?: string | null) => Promise<FeedResponse>;
-  loadMoreLabel?: string;
   onUnauthorized: () => void;
   queryKey: QueryKey;
 };
@@ -22,10 +24,10 @@ export default function FeedTimeline({
   currentUserName,
   emptyStateMessage = "No posts yet.",
   loadPosts,
-  loadMoreLabel = "Load more posts",
   onUnauthorized,
   queryKey,
 }: FeedTimelineProps) {
+  const [postUiStates, setPostUiStates] = useState<Record<string, FeedPostCardUiState>>({});
   const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } =
     useInfiniteFeedQuery({
       loadPosts,
@@ -45,6 +47,22 @@ export default function FeedTimeline({
         : "Unable to load feed."
       : null;
 
+  if (!posts.length && !hasNextPage) {
+    return (
+      <>
+        {errorMessage ? (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        ) : null}
+
+        <div className="border-line rounded-2xl border bg-white px-5 py-10 text-center shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
+          <p className="text-ink text-sm font-medium">{emptyStateMessage}</p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       {errorMessage ? (
@@ -53,27 +71,50 @@ export default function FeedTimeline({
         </div>
       ) : null}
 
-      {posts.map((post) => (
-        <FeedPostCard key={post.id} currentUserName={currentUserName} onUnauthorized={onUnauthorized} post={post} />
-      ))}
+      <Virtuoso
+        computeItemKey={(_index, post) => post.id}
+        data={posts}
+        endReached={() => {
+          if (!hasNextPage || isFetchingNextPage) {
+            return;
+          }
 
-      {!posts.length && !hasNextPage ? (
-        <div className="border-line rounded-2xl border bg-white px-5 py-10 text-center shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
-          <p className="text-ink text-sm font-medium">{emptyStateMessage}</p>
+          void fetchNextPage();
+        }}
+        increaseViewportBy={{ bottom: 800, top: 400 }}
+        itemContent={(_index, post) => (
+          <div className="pb-6 mb-6 last:pb-0">
+            <FeedPostCard
+              currentUserName={currentUserName}
+              onUnauthorized={onUnauthorized}
+              post={post}
+              uiState={postUiStates[post.id]}
+              updateUiState={(updater) => {
+                setPostUiStates((current) => {
+                  const previousState = current[post.id];
+                  const nextState = updater(previousState);
+
+                  if (!nextState) {
+                    return current;
+                  }
+
+                  return {
+                    ...current,
+                    [post.id]: nextState,
+                  };
+                });
+              }}
+            />
+          </div>
+        )}
+        useWindowScroll
+      />
+
+      {isFetchingNextPage ? (
+        <div className="text-muted flex items-center justify-center gap-2 pt-2 text-sm">
+          <LoaderCircle className="h-4 w-4 animate-spin" />
+          Loading more posts...
         </div>
-      ) : null}
-
-      {hasNextPage ? (
-        <button
-          type="button"
-          onClick={() => {
-            void fetchNextPage();
-          }}
-          disabled={isFetchingNextPage}
-          className="border-line text-ink hover:border-accent/40 hover:text-accent w-full rounded-lg border bg-white px-5 py-4 text-sm font-semibold shadow-[0_18px_45px_rgba(17,32,50,0.08)] transition disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {isFetchingNextPage ? "Loading more..." : loadMoreLabel}
-        </button>
       ) : null}
     </>
   );

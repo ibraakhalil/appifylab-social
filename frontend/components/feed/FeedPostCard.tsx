@@ -33,21 +33,40 @@ import { isUnauthorizedApiError } from "@/lib/query/utils";
 
 import { buildProfileHref, formatRelativeTime } from "./feedUtils";
 
+export type FeedPostCardUiState = {
+  activeReplyId: string | null;
+  commentDraft: string;
+  isExpanded: boolean;
+  replyDrafts: Record<string, string>;
+};
+
 type FeedPostCardProps = {
   currentUserName: string;
   onUnauthorized: () => void;
   post: FeedPost;
+  uiState?: FeedPostCardUiState;
+  updateUiState: (
+    updater: (current: FeedPostCardUiState | undefined) => FeedPostCardUiState,
+  ) => void;
 };
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
-function useFeedPostCard({ onUnauthorized, post }: FeedPostCardProps) {
-  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
-  const [commentDraft, setCommentDraft] = useState("");
+const getDefaultUiState = (): FeedPostCardUiState => ({
+  activeReplyId: null,
+  commentDraft: "",
+  isExpanded: false,
+  replyDrafts: {},
+});
+
+function useFeedPostCard({ onUnauthorized, post, uiState, updateUiState }: FeedPostCardProps) {
+  const persistedUiState = uiState ?? getDefaultUiState();
+  const activeReplyId = persistedUiState.activeReplyId;
+  const commentDraft = persistedUiState.commentDraft;
   const [error, setError] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const isExpanded = persistedUiState.isExpanded;
+  const replyDrafts = persistedUiState.replyDrafts;
   const [showReactionDialog, setShowReactionDialog] = useState(false);
   const [submittingReplyId, setSubmittingReplyId] = useState<string | null>(null);
 
@@ -87,8 +106,11 @@ function useFeedPostCard({ onUnauthorized, post }: FeedPostCardProps) {
   };
 
   const handleToggleComments = () => {
-    setIsExpanded((current) => !current);
-    setActiveReplyId(null);
+    updateUiState((current) => ({
+      ...(current ?? getDefaultUiState()),
+      activeReplyId: null,
+      isExpanded: !(current?.isExpanded ?? false),
+    }));
   };
 
   const handleReactionDialogChange = (open: boolean) => {
@@ -109,7 +131,10 @@ function useFeedPostCard({ onUnauthorized, post }: FeedPostCardProps) {
         input: { content: value },
         postId: post.id,
       });
-      setCommentDraft("");
+      updateUiState((current) => ({
+        ...(current ?? getDefaultUiState()),
+        commentDraft: "",
+      }));
     } catch (mutationError) {
       if (isUnauthorizedApiError(mutationError)) {
         return;
@@ -120,10 +145,13 @@ function useFeedPostCard({ onUnauthorized, post }: FeedPostCardProps) {
   };
 
   const handleReplyDraftChange = (commentId: string, value: string) => {
-    setActiveReplyId(commentId);
-    setReplyDrafts((current) => ({
-      ...current,
-      [commentId]: value,
+    updateUiState((current) => ({
+      ...(current ?? getDefaultUiState()),
+      activeReplyId: commentId,
+      replyDrafts: {
+        ...(current?.replyDrafts ?? {}),
+        [commentId]: value,
+      },
     }));
   };
 
@@ -144,11 +172,14 @@ function useFeedPostCard({ onUnauthorized, post }: FeedPostCardProps) {
         postId: post.id,
       });
 
-      setReplyDrafts((current) => ({
-        ...current,
-        [commentId]: "",
+      updateUiState((current) => ({
+        ...(current ?? getDefaultUiState()),
+        activeReplyId: null,
+        replyDrafts: {
+          ...(current?.replyDrafts ?? {}),
+          [commentId]: "",
+        },
       }));
-      setActiveReplyId(null);
     } catch (mutationError) {
       if (isUnauthorizedApiError(mutationError)) {
         return;
@@ -226,7 +257,12 @@ function useFeedPostCard({ onUnauthorized, post }: FeedPostCardProps) {
     reactionError,
     reactions: reactionsQuery.data ?? [],
     replyDrafts,
-    setCommentDraft,
+    setCommentDraft: (value: string) => {
+      updateUiState((current) => ({
+        ...(current ?? getDefaultUiState()),
+        commentDraft: value,
+      }));
+    },
     showReactionDialog,
     submittingReplyId,
   };

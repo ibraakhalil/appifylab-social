@@ -134,7 +134,6 @@ export default function ProfileContent({
         <FeedTimeline
           currentUserName={currentUserName}
           emptyStateMessage={emptyStateMessage}
-          loadMoreLabel={profile.isCurrentUser ? "Load more of your posts" : "Load more posts"}
           loadPosts={(cursor?: string | null) =>
             userId ? getUserProfilePosts(userId, cursor) : getMyProfilePosts(cursor)
           }
