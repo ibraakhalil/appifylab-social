@@ -14,6 +14,7 @@ type FeedContentProps = {
 };
 
 export default function FeedContent({ onUnauthorized, user }: FeedContentProps) {
+  const currentUserId = user?.id;
   const currentUserName = user ? `${user.firstName} ${user.lastName}` : "User";
   const currentUserFirstName = user?.firstName ?? "there";
 
@@ -31,6 +32,7 @@ export default function FeedContent({ onUnauthorized, user }: FeedContentProps) 
       <StoriesSection />
 
       <FeedTimeline
+        currentUserId={currentUserId}
         currentUserName={currentUserName}
         loadPosts={getFeed}
         onUnauthorized={onUnauthorized}

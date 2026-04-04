@@ -28,7 +28,7 @@ const getPalette = (name: string) => {
 export default function Avatar({ className = "", name }: AvatarProps) {
   return (
     <span
-      className={`flex items-center justify-center rounded-full bg-gradient-to-br ${getPalette(name)} font-semibold text-white ${className}`}
+      className={`flex items-center justify-center rounded-full bg-linear-to-br ${getPalette(name)} font-semibold text-white ${className}`}
       aria-hidden="true"
     >
       {getInitials(name) || "U"}

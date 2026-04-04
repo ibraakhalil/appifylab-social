@@ -9,12 +9,12 @@ import {
   LoaderCircle,
   Lock,
   MessageCircle,
-  MoreHorizontal,
   Send,
   ThumbsUp,
 } from "lucide-react";
 
 import CommentThread from "@/components/feed/CommentThread";
+import PostCardActions from "@/components/feed/PostCardActions";
 import ReactionUsersDialog from "@/components/feed/ReactionUsersDialog";
 import Avatar from "@/components/ui/Avatar";
 import { getPostLikes } from "@/lib/api/posts";
@@ -41,6 +41,7 @@ export type FeedPostCardUiState = {
 };
 
 type FeedPostCardProps = {
+  currentUserId?: string;
   currentUserName: string;
   onUnauthorized: () => void;
   post: FeedPost;
@@ -269,7 +270,8 @@ function useFeedPostCard({ onUnauthorized, post, uiState, updateUiState }: FeedP
 }
 
 export default function FeedPostCard(props: FeedPostCardProps) {
-  const { currentUserName, onUnauthorized, post } = props;
+  const { currentUserId, currentUserName, onUnauthorized, post } = props;
+  const canManagePost = currentUserId === post.author.id;
   const visibilityLabel = post.visibility === "public" ? "Public" : "Private";
   const {
     activeReplyId,
@@ -331,13 +333,7 @@ export default function FeedPostCard(props: FeedPostCardProps) {
               </div>
             </div>
           </div>
-          <button
-            className="bg-surface-muted text-muted hover:bg-accent/10 hover:text-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition"
-            type="button"
-            aria-label="More post options"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
+          <PostCardActions canManagePost={canManagePost} />
         </div>
 
         <div className="mt-4 space-y-4">

@@ -13,6 +13,7 @@ import FeedPostCard, { type FeedPostCardUiState } from "./FeedPostCard";
 import FeedSkeleton from "./FeedSkeleton";
 
 type FeedTimelineProps = {
+  currentUserId?: string;
   currentUserName: string;
   emptyStateMessage?: string;
   loadPosts: (cursor?: string | null) => Promise<FeedResponse>;
@@ -21,6 +22,7 @@ type FeedTimelineProps = {
 };
 
 export default function FeedTimeline({
+  currentUserId,
   currentUserName,
   emptyStateMessage = "No posts yet.",
   loadPosts,
@@ -85,6 +87,7 @@ export default function FeedTimeline({
         itemContent={(_index, post) => (
           <div className="pb-6 mb-6 last:pb-0">
             <FeedPostCard
+              currentUserId={currentUserId}
               currentUserName={currentUserName}
               onUnauthorized={onUnauthorized}
               post={post}
