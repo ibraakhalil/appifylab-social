@@ -3,15 +3,8 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
-import { useState } from "react";
-import {
-  Globe2,
-  LoaderCircle,
-  Lock,
-  MessageCircle,
-  Send,
-  ThumbsUp,
-} from "lucide-react";
+import { Fragment, useState } from "react";
+import { Globe2, LoaderCircle, Lock, MessageCircle, Send, ThumbsUp } from "lucide-react";
 
 import CommentThread from "@/components/feed/CommentThread";
 import PostCardActions from "@/components/feed/PostCardActions";
@@ -302,8 +295,8 @@ export default function FeedPostCard(props: FeedPostCardProps) {
   } = useFeedPostCard(props);
 
   return (
-    <>
-      <article className="rounded-2xl border border-white/70 bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
+    <Fragment>
+      <article className="rounded-2xl border border-white/70 bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5 ">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Link href={buildProfileHref(post.author.id)} className="shrink-0">
@@ -480,6 +473,6 @@ export default function FeedPostCard(props: FeedPostCardProps) {
         title="Reactions"
         users={reactions}
       />
-    </>
+    </Fragment>
   );
 }

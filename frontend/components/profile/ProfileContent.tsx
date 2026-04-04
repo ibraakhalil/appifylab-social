@@ -77,7 +77,7 @@ export default function ProfileContent({
   ];
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pt-4">
       {error ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
           {error}
@@ -130,17 +130,15 @@ export default function ProfileContent({
         </div>
       </section>
 
-      <section className="space-y-4">
-        <FeedTimeline
-          currentUserName={currentUserName}
-          emptyStateMessage={emptyStateMessage}
-          loadPosts={(cursor?: string | null) =>
-            userId ? getUserProfilePosts(userId, cursor) : getMyProfilePosts(cursor)
-          }
-          onUnauthorized={onUnauthorized}
-          queryKey={feedKeys.profile(userId)}
-        />
-      </section>
+      <FeedTimeline
+        currentUserName={currentUserName}
+        emptyStateMessage={emptyStateMessage}
+        loadPosts={(cursor?: string | null) =>
+          userId ? getUserProfilePosts(userId, cursor) : getMyProfilePosts(cursor)
+        }
+        onUnauthorized={onUnauthorized}
+        queryKey={feedKeys.profile(userId)}
+      />
     </div>
   );
 }

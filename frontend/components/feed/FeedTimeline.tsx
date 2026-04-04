@@ -1,7 +1,7 @@
 "use client";
 
 import type { QueryKey } from "@tanstack/react-query";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
 
@@ -66,7 +66,7 @@ export default function FeedTimeline({
   }
 
   return (
-    <>
+    <Fragment>
       {errorMessage ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {errorMessage}
@@ -74,18 +74,15 @@ export default function FeedTimeline({
       ) : null}
 
       <Virtuoso
-        computeItemKey={(_index, post) => post.id}
+        useWindowScroll
         data={posts}
+        computeItemKey={(_index, post) => post.id}
         endReached={() => {
-          if (!hasNextPage || isFetchingNextPage) {
-            return;
-          }
-
+          if (!hasNextPage || isFetchingNextPage) return;
           void fetchNextPage();
         }}
-        increaseViewportBy={{ bottom: 800, top: 400 }}
         itemContent={(_index, post) => (
-          <div className="pb-6 mb-6 last:pb-0">
+          <div className="pb-4">
             <FeedPostCard
               currentUserId={currentUserId}
               currentUserName={currentUserName}
@@ -96,21 +93,13 @@ export default function FeedTimeline({
                 setPostUiStates((current) => {
                   const previousState = current[post.id];
                   const nextState = updater(previousState);
-
-                  if (!nextState) {
-                    return current;
-                  }
-
-                  return {
-                    ...current,
-                    [post.id]: nextState,
-                  };
+                  if (!nextState) return current;
+                  return { ...current, [post.id]: nextState };
                 });
               }}
             />
           </div>
         )}
-        useWindowScroll
       />
 
       {isFetchingNextPage ? (
@@ -119,6 +108,6 @@ export default function FeedTimeline({
           Loading more posts...
         </div>
       ) : null}
-    </>
+    </Fragment>
   );
 }

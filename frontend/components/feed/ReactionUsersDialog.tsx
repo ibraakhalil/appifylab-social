@@ -36,53 +36,53 @@ export default function ReactionUsersDialog({
 }: ReactionUsersDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+      <DialogContent className="overflow-hidden p-0">
+        <DialogHeader className="border-line/70 border-b pb-5 ">
+          <div className="flex items-center gap-3">
+            <DialogTitle>{title}</DialogTitle>
+            <span className="bg-surface-muted text-ink inline-flex min-w-8 items-center justify-center rounded-full px-2.5 py-1 text-xs font-semibold">
+              {users.length}
+            </span>
+          </div>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="bg-surface-muted mt-4 flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
-          <p className="text-ink text-sm font-medium">Total reactions</p>
-          <span className="text-muted rounded-full bg-white px-3 py-1 text-xs font-semibold">
-            {users.length}
-          </span>
-        </div>
-
         {isLoading ? (
-          <div className="text-muted mt-4 flex items-center gap-2 text-sm">
+          <div className="text-muted flex min-h-40 items-center justify-center gap-2  py-8 text-sm">
             <LoaderCircle className="h-4 w-4 animate-spin" />
             Loading reactions...
           </div>
         ) : error ? (
-          <p className="mt-4 text-sm text-red-600">{error}</p>
+          <div className="px-6 py-6">
+            <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {error}
+            </p>
+          </div>
         ) : users.length ? (
-          <div className="max-h-88 mt-4 space-y-3 overflow-y-auto pr-1">
+          <div className="max-h-96 overflow-y-auto py-2">
             {users.map((user) => (
-              <div
+              <Link
                 key={user.id}
-                className="border-line/70 bg-surface-muted/60 flex items-center gap-3 rounded-2xl border px-3 py-3"
+                href={buildProfileHref(user.id)}
+                className="focus-visible:ring-accent/30 flex items-center gap-3 rounded-2xl py-3 transition focus-visible:outline-none focus-visible:ring-4"
               >
-                <Link href={buildProfileHref(user.id)} className="shrink-0">
-                  <Avatar
-                    name={`${user.firstName} ${user.lastName}`}
-                    className="h-9 w-9 shrink-0 text-xs"
-                  />
-                </Link>
+                <Avatar
+                  name={`${user.firstName} ${user.lastName}`}
+                  className="h-10 w-10 shrink-0 text-xs"
+                />
                 <div className="min-w-0">
-                  <Link
-                    href={buildProfileHref(user.id)}
-                    className="text-ink hover:text-accent truncate text-sm font-medium transition"
-                  >
+                  <p className="text-ink truncate text-sm font-medium">
                     {user.firstName} {user.lastName}
-                  </Link>
-                  <p className="text-muted truncate text-xs">{user.email}</p>
+                  </p>
+                  <p className="text-muted truncate text-sm">{user.email}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
-          <p className="text-muted mt-4 text-sm">No reactions yet.</p>
+          <div className="flex min-h-40 items-center justify-center px-6 py-8 text-center">
+            <p className="text-muted text-sm">No reactions yet.</p>
+          </div>
         )}
       </DialogContent>
     </Dialog>

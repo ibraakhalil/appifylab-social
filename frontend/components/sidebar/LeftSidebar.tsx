@@ -23,10 +23,10 @@ const exploreItems = [
 export default function LeftSidebar() {
   return (
     <aside
-      className="hide-scrollbar sticky overflow-y-auto pb-4"
+      className="hide-scrollbar sticky overflow-y-auto py-4"
       style={{
-        top: "calc(var(--header-height) + var(--layout-offset))",
-        maxHeight: "calc(100vh - var(--header-height) - var(--layout-offset))",
+        top: "calc(var(--header-height))",
+        maxHeight: "calc(100vh - var(--header-height))",
       }}
     >
       <div className="space-y-4">

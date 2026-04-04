@@ -4,9 +4,13 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
+import { getFeed } from "@/lib/api/posts";
+import { feedKeys } from "@/lib/query/keys";
 
-import FeedContent from "./FeedContent";
+import FeedComposerSection from "./FeedComposerSection";
 import FeedSkeleton from "./FeedSkeleton";
+import FeedTimeline from "./FeedTimeline";
+import StoriesSection from "./StoriesSection";
 
 export default function FeedContainer() {
   const router = useRouter();
@@ -22,13 +26,31 @@ export default function FeedContainer() {
     return <FeedSkeleton />;
   }
 
+  const currentUserId = user?.id;
+  const currentUserName = user ? `${user.firstName} ${user.lastName}` : "User";
+  const currentUserFirstName = user?.firstName ?? "there";
+  const handleUnauthorized = () => {
+    logout();
+    router.replace("/login");
+  };
+
   return (
-    <FeedContent
-      onUnauthorized={() => {
-        logout();
-        router.replace("/login");
-      }}
-      user={user}
-    />
+    <div className="space-y-4 pt-4" style={{ minHeight: "calc(100vh - var(--header-height))" }}>
+      <FeedComposerSection
+        currentUserFirstName={currentUserFirstName}
+        currentUserName={currentUserName}
+        onUnauthorized={handleUnauthorized}
+      />
+
+      <StoriesSection />
+
+      <FeedTimeline
+        currentUserId={currentUserId}
+        currentUserName={currentUserName}
+        loadPosts={getFeed}
+        onUnauthorized={handleUnauthorized}
+        queryKey={feedKeys.home()}
+      />
+    </div>
   );
 }
