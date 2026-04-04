@@ -40,7 +40,7 @@ export default function DeleteConfirmationDialog({
         </DialogHeader>
 
         {error ? (
-          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="border-danger-line bg-danger-surface text-danger-ink mt-4 rounded-lg border px-4 py-3 text-sm">
             {error}
           </div>
         ) : null}
@@ -58,7 +58,7 @@ export default function DeleteConfirmationDialog({
             type="button"
             onClick={onConfirm}
             disabled={isDeleting}
-            className="flex min-w-28 items-center justify-center gap-2 rounded-full bg-red-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="bg-danger hover:bg-danger-strong text-contrast flex min-w-28 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isDeleting ? (
               <>

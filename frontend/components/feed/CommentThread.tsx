@@ -119,7 +119,7 @@ function ReplyCard({
 
   return (
     <>
-      <div className="rounded-3xl bg-white p-4 shadow-sm">
+      <div className="bg-surface rounded-3xl p-4 shadow-sm">
         <ThreadCard
           avatarClassName="h-9 w-9 text-sm"
           content={reply.content}
@@ -202,12 +202,12 @@ export default function CommentThread({
               value={replyDrafts[comment.id] ?? ""}
               onChange={(event) => onReplyChange(comment.id, event.target.value)}
               placeholder="Write a reply..."
-              className="border-line text-ink focus:border-accent/50 h-11 flex-1 rounded-full border bg-white px-4 text-sm outline-none transition"
+              className="border-line bg-surface text-ink focus:border-accent/50 h-11 flex-1 rounded-full border px-4 text-sm outline-none transition"
             />
             <button
               type="submit"
               disabled={replySubmitPendingId === comment.id}
-              className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
+              className="bg-accent hover:bg-accent-strong text-contrast rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
             >
               {replySubmitPendingId === comment.id ? "Replying..." : "Reply"}
             </button>

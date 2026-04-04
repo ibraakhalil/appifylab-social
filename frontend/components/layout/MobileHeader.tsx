@@ -15,6 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import dynamic from "next/dynamic";
+
+const ThemeToggle = dynamic(() => import("@/components/layout/ThemeToggle"), {
+  ssr: false,
+  loading: () => (
+    <div className="border-line bg-surface-muted h-11 w-11 rounded-full border transition" />
+  ),
+});
 
 export default function MobileHeader() {
   const router = useRouter();
@@ -27,7 +35,7 @@ export default function MobileHeader() {
 
   return (
     <header
-      className="border-line/70 sticky top-0 z-50 border-b bg-white/95 backdrop-blur lg:hidden"
+      className="border-line/70 bg-header/95 sticky top-0 z-50 border-b backdrop-blur lg:hidden"
       style={{ height: "var(--header-height)" }}
     >
       <div
@@ -46,13 +54,14 @@ export default function MobileHeader() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <button
             type="button"
             className="text-muted hover:text-accent relative flex h-11 w-11 items-center justify-center rounded-2xl transition"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
-            <span className="bg-accent absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white">
+            <span className="bg-accent text-contrast absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold">
               6
             </span>
           </button>
@@ -68,7 +77,7 @@ export default function MobileHeader() {
                     name={`${user.firstName} ${user.lastName}`}
                     className="h-10 w-10 text-xs"
                   />
-                  <span className="text-subtle absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-white shadow-sm">
+                  <span className="border-line bg-surface text-subtle absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border shadow-sm">
                     <ChevronDown className="h-3 w-3" />
                   </span>
                 </button>
@@ -104,7 +113,7 @@ export default function MobileHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="flex items-center gap-3 text-red-600 focus:bg-red-50 focus:text-red-700"
+                  className="text-danger focus:bg-danger-surface focus:text-danger-strong flex items-center gap-3"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout
@@ -114,7 +123,7 @@ export default function MobileHeader() {
           ) : (
             <Link
               href="/login"
-              className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition"
+              className="bg-accent hover:bg-accent-strong text-contrast rounded-full px-4 py-2 text-sm font-semibold transition"
             >
               Login
             </Link>

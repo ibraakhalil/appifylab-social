@@ -30,14 +30,14 @@ export default function LeftSidebar() {
       }}
     >
       <div className="space-y-4">
-        <section className="border-line rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="border-line bg-surface rounded-2xl border p-5 shadow-sm">
           <h2 className="text-ink mb-4 text-base font-semibold">Explore</h2>
           <ul className="space-y-2">
             {exploreItems.map(({ label, icon: Icon, badge }) => (
               <li key={label}>
                 <Link
                   href="#"
-                  className="flex items-center justify-between rounded-xl py-1.5 text-sm font-medium transition hover:text-gray-100"
+                  className="text-muted hover:text-ink flex items-center justify-between rounded-xl py-1.5 text-sm font-medium transition"
                 >
                   <span className="flex items-center gap-3">
                     <span className="bg-surface-muted text-accent flex items-center justify-center rounded-xl">
@@ -56,7 +56,7 @@ export default function LeftSidebar() {
           </ul>
         </section>
 
-        <section className="border-line rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="border-line bg-surface rounded-2xl border p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-ink text-base font-semibold">Suggested People</h2>
             <Link className="text-accent text-xs font-semibold" href="#">
@@ -94,7 +94,7 @@ export default function LeftSidebar() {
           </ul>
         </section>
 
-        <section className="border-line rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="border-line bg-surface rounded-2xl border p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-ink text-base font-semibold">Events</h2>
             <Link href="#" className="text-accent text-xs font-semibold">

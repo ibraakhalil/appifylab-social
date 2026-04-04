@@ -20,7 +20,7 @@ export default function StoriesSection() {
         {stories.map((story) => (
           <article
             key={story.id}
-            className="relative h-[200px] w-[138px] shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm"
+            className="bg-surface relative h-[200px] w-[138px] shrink-0 overflow-hidden rounded-2xl shadow-sm"
           >
             {!story.isAdd ? (
               <Image
@@ -35,12 +35,12 @@ export default function StoriesSection() {
               className={`absolute inset-0 ${
                 story.isAdd
                   ? "bg-surface-muted"
-                  : "bg-linear-to-t from-black/55 via-black/10 to-transparent"
+                  : "bg-linear-to-t from-story-overlay-from via-story-overlay-via to-clear"
               }`}
             />
             {story.isAdd ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 text-center">
-                <span className="bg-accent flex h-12 w-12 items-center justify-center rounded-full text-white">
+                <span className="bg-accent text-contrast flex h-12 w-12 items-center justify-center rounded-full">
                   <Plus className="h-5 w-5" />
                 </span>
                 <div>
@@ -53,11 +53,11 @@ export default function StoriesSection() {
                 <div>
                   <Avatar
                     name={storyNames[(story.id - 2) % storyNames.length] ?? story.name}
-                    className="h-9 w-9 border-2 border-white text-[10px]"
+                    className="border-contrast h-9 w-9 border-2 text-[10px]"
                   />
                 </div>
                 <div>
-                  <p className="line-clamp-2 text-sm font-semibold leading-5 text-white">
+                  <p className="text-contrast line-clamp-2 text-sm font-semibold leading-5">
                     {storyNames[(story.id - 2) % storyNames.length] ?? story.name}
                   </p>
                 </div>

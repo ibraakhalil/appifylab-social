@@ -34,7 +34,7 @@ const postMenuItems: PostMenuItem[] = [
     action: "delete",
     icon: Trash2,
     label: "Delete post",
-    className: "text-red-600 focus:bg-red-50 focus:text-red-600",
+    className: "text-danger focus:bg-danger-surface focus:text-danger-strong",
     requiresOwnership: true,
   },
   {

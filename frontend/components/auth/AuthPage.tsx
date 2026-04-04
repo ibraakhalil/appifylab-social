@@ -77,7 +77,7 @@ function AuthInput({
           placeholder={placeholder}
           type={type}
           value={value}
-          className="border-line text-ink focus:border-accent/50 focus:ring-accent/10 h-12 w-full rounded-2xl border bg-white pl-11 pr-4 text-sm outline-none transition focus:ring-4"
+          className="border-line bg-surface text-ink focus:border-accent/50 focus:ring-accent/10 h-12 w-full rounded-2xl border pl-11 pr-4 text-sm outline-none transition focus:ring-4"
         />
       </span>
     </label>
@@ -196,7 +196,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 priority
               />
               {isRegistration ? (
-                <div className="absolute -bottom-2 right-8 w-[180px] rounded-lg bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.14)]">
+                <div className="bg-surface absolute -bottom-2 right-8 w-[180px] rounded-lg p-4 shadow-[var(--shadow-popover)]">
                   <div className="flex items-center gap-3">
                     <span className="bg-accent/10 text-accent flex h-11 w-11 items-center justify-center rounded-2xl">
                       <UserPlus className="h-5 w-5" />
@@ -213,7 +213,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
         </section>
 
         <section className="mx-auto w-full max-w-[448px]">
-          <div className="rounded-[32px] border border-white/70 bg-white p-6 shadow-[0_24px_60px_rgba(17,32,50,0.12)] sm:p-8">
+          <div className="bg-surface border-line rounded-[32px] border p-6 shadow-[var(--shadow-panel)] sm:p-8">
             <div className="mb-10 text-center">
               <h2 className="text-ink text-[28px] font-semibold leading-tight">{content.title}</h2>
               <p className="text-muted mt-2 text-sm">
@@ -276,7 +276,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
               ) : null}
 
               {error ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="border-danger-line bg-danger-surface text-danger-ink rounded-2xl border px-4 py-3 text-sm">
                   {error}
                 </div>
               ) : null}
@@ -300,7 +300,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
               <button
                 type="submit"
                 disabled={isSubmitting || !isReady}
-                className="bg-accent hover:bg-accent-strong disabled:bg-accent/60 flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-white transition disabled:cursor-not-allowed"
+                className="bg-accent hover:bg-accent-strong disabled:bg-accent/60 text-contrast flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold transition disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Please wait..." : content.submitLabel}
                 <ArrowRight className="h-4 w-4" />

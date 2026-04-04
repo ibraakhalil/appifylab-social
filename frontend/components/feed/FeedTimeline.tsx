@@ -53,12 +53,12 @@ export default function FeedTimeline({
     return (
       <>
         {errorMessage ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="border-danger-line bg-danger-surface text-danger-ink rounded-lg border px-4 py-3 text-sm">
             {errorMessage}
           </div>
         ) : null}
 
-        <div className="border-line rounded-2xl border bg-white px-5 py-10 text-center shadow-[0_18px_45px_rgba(17,32,50,0.08)]">
+        <div className="border-line bg-surface rounded-2xl border px-5 py-10 text-center shadow-(--shadow-card)">
           <p className="text-ink text-sm font-medium">{emptyStateMessage}</p>
         </div>
       </>
@@ -68,7 +68,7 @@ export default function FeedTimeline({
   return (
     <Fragment>
       {errorMessage ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="border-danger-line bg-danger-surface text-danger-ink rounded-lg border px-4 py-3 text-sm">
           {errorMessage}
         </div>
       ) : null}

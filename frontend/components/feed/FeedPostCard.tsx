@@ -296,7 +296,7 @@ export default function FeedPostCard(props: FeedPostCardProps) {
 
   return (
     <Fragment>
-      <article className="rounded-2xl border border-white/70 bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5 ">
+      <article className="bg-surface border-line rounded-2xl border p-4 shadow-(--shadow-card) sm:p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Link href={buildProfileHref(post.author.id)} className="shrink-0">
@@ -351,7 +351,7 @@ export default function FeedPostCard(props: FeedPostCardProps) {
 
         <div className="border-line/70 text-muted mt-4 flex flex-col gap-3 border-b pb-4 text-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="inline-flex items-center gap-2">
-            <span className="bg-accent flex size-6 items-center justify-center rounded-full text-white">
+            <span className="bg-accent text-contrast flex size-6 items-center justify-center rounded-full">
               <ThumbsUp className="size-3" />
             </span>
             <button
@@ -399,7 +399,7 @@ export default function FeedPostCard(props: FeedPostCardProps) {
         </div>
 
         {error ? (
-          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="border-danger-line bg-danger-surface text-danger-ink mt-4 rounded-lg border px-4 py-3 text-sm">
             {error}
           </div>
         ) : null}
@@ -418,19 +418,19 @@ export default function FeedPostCard(props: FeedPostCardProps) {
                 value={commentDraft}
                 onChange={(event) => setCommentDraft(event.target.value)}
                 placeholder="Write a comment..."
-                className="border-line text-ink focus:border-accent/50 h-11 flex-1 rounded-full border bg-white px-4 text-sm outline-none transition"
+                className="border-line bg-surface text-ink focus:border-accent/50 h-11 flex-1 rounded-full border px-4 text-sm transition outline-none"
               />
               <button
                 type="submit"
                 disabled={isCommentSubmitDisabled}
-                className="bg-accent hover:bg-accent-strong rounded-full px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
+                className="bg-accent hover:bg-accent-strong text-contrast rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isCommentSubmitDisabled && commentDraft.trim() ? "Sending..." : "Send"}
               </button>
             </form>
 
             {commentsError ? (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="border-danger-line bg-danger-surface text-danger-ink rounded-lg border px-4 py-3 text-sm">
                 {commentsError}
               </div>
             ) : null}

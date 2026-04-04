@@ -54,7 +54,7 @@ export default function ReactionUsersDialog({
           </div>
         ) : error ? (
           <div className="px-6 py-6">
-            <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            <p className="border-danger-line bg-danger-surface text-danger rounded-2xl border px-4 py-3 text-sm">
               {error}
             </p>
           </div>

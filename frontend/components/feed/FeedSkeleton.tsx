@@ -12,7 +12,7 @@ function SkeletonBlock({ className }: { className?: string }) {
 
 function FeedComposerSkeleton() {
   return (
-    <section className="rounded-2xl bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
+    <section className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-card)] sm:p-5">
       <div className="flex items-start gap-3">
         <SkeletonBlock className="mt-1 h-11 w-11 rounded-full" />
         <div className="flex-1 space-y-3">
@@ -46,7 +46,7 @@ function StoriesSkeleton() {
           return (
             <article
               key={index}
-              className="relative h-[200px] w-[138px] shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm"
+              className="bg-surface relative h-[200px] w-[138px] shrink-0 overflow-hidden rounded-2xl shadow-sm"
             >
               <div className="bg-surface-muted absolute inset-0 animate-pulse" />
 
@@ -60,10 +60,10 @@ function StoriesSkeleton() {
                 </div>
               ) : (
                 <div className="absolute inset-0 flex flex-col justify-between p-3">
-                  <SkeletonBlock className="h-9 w-9 rounded-full border-2 border-white/70 bg-white/70" />
+                  <SkeletonBlock className="bg-surface/70 border-line h-9 w-9 rounded-full border-2" />
                   <div className="space-y-2">
-                    <SkeletonBlock className="h-4 w-20 rounded-full bg-white/70" />
-                    <SkeletonBlock className="h-4 w-16 rounded-full bg-white/55" />
+                    <SkeletonBlock className="bg-surface/70 h-4 w-20 rounded-full" />
+                    <SkeletonBlock className="bg-surface/55 h-4 w-16 rounded-full" />
                   </div>
                 </div>
               )}
@@ -83,7 +83,7 @@ function FeedPostSkeleton({
   textLineWidths?: string[];
 }) {
   return (
-    <article className="rounded-2xl border border-white/70 bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
+    <article className="bg-surface border-line rounded-2xl border p-4 shadow-[var(--shadow-card)] sm:p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <SkeletonBlock className="h-11 w-11 rounded-full" />

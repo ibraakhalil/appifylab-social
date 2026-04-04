@@ -53,7 +53,7 @@ export default function ProfileContent({
 
   if (!profile) {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+      <div className="border-danger-line bg-danger-surface text-danger-ink rounded-2xl border px-5 py-4 text-sm">
         {error ?? "Unable to load profile."}
       </div>
     );
@@ -79,12 +79,12 @@ export default function ProfileContent({
   return (
     <div className="space-y-6 pt-4">
       {error ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+        <div className="border-warning-line bg-warning-surface text-warning-ink rounded-2xl border px-5 py-4 text-sm">
           {error}
         </div>
       ) : null}
 
-      <section className="border-line/70 rounded-3xl border bg-white px-5 py-6 shadow-[0_16px_40px_rgba(17,32,50,0.06)] sm:px-6">
+      <section className="border-line/70 bg-surface rounded-3xl border px-5 py-6 shadow-[var(--shadow-subtle)] sm:px-6">
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-4">

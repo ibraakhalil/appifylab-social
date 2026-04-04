@@ -6,10 +6,10 @@ type AvatarProps = {
 };
 
 const palette = [
-  "from-[#0f766e] to-[#14b8a6]",
-  "from-[#1d4ed8] to-[#60a5fa]",
-  "from-[#b45309] to-[#f59e0b]",
-  "from-[#be123c] to-[#fb7185]",
+  "avatar-palette-teal",
+  "avatar-palette-blue",
+  "avatar-palette-amber",
+  "avatar-palette-rose",
 ];
 
 const getInitials = (name: string) =>
@@ -26,9 +26,11 @@ const getPalette = (name: string) => {
 };
 
 export default function Avatar({ className = "", name }: AvatarProps) {
+  const paletteClassName = getPalette(name);
+
   return (
     <span
-      className={`flex items-center justify-center rounded-full bg-linear-to-br ${getPalette(name)} font-semibold text-white ${className}`}
+      className={`${paletteClassName} text-contrast flex items-center justify-center rounded-full font-semibold ${className}`}
       aria-hidden="true"
     >
       {getInitials(name) || "U"}

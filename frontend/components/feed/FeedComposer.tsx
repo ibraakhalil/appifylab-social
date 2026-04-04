@@ -78,7 +78,7 @@ export default function FeedComposer({
   const VisibilityIcon = composer.visibility === "public" ? Globe : Lock;
 
   return (
-    <section className="rounded-2xl bg-white p-4 shadow-[0_18px_45px_rgba(17,32,50,0.08)] sm:p-5">
+    <section className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-card)] sm:p-5">
       <div className="flex items-start gap-3">
         <Avatar name={currentUserName} className="mt-1 size-11 text-sm max-sm:hidden" />
         <form className="flex-1 space-y-3" onSubmit={handleSubmit}>
@@ -87,13 +87,13 @@ export default function FeedComposer({
               value={composer.contentText}
               onChange={(event) => onContentTextChange(event.target.value)}
               className={cn(
-                "bg-surface-muted text-ink focus:border-accent/50 min-h-28 w-full rounded-lg border border-transparent px-5 py-4 text-sm outline-none transition focus:bg-white",
+                "bg-surface-muted text-ink focus:border-accent/50 min-h-28 w-full rounded-lg border border-transparent px-5 py-4 text-sm outline-none transition focus:bg-surface",
                 composer.imagePreviewUrl ? "pr-28" : undefined,
               )}
               placeholder={`What's on your mind, ${currentUserFirstName}?`}
             />
             {composer.imagePreviewUrl ? (
-              <div className="absolute right-4 top-4 flex items-start gap-2 rounded-2xl border border-white/80 bg-white/95 p-2 shadow-[0_10px_30px_rgba(17,32,50,0.14)]">
+              <div className="bg-surface/95 border-line absolute right-4 top-4 flex items-start gap-2 rounded-2xl border p-2 shadow-[var(--shadow-float)]">
                 <Image
                   src={composer.imagePreviewUrl}
                   alt="Selected preview"
@@ -115,7 +115,7 @@ export default function FeedComposer({
           </div>
 
           {error ? (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="border-danger-line bg-danger-surface text-danger-ink rounded-2xl border px-4 py-3 text-sm">
               {error}
             </div>
           ) : null}
@@ -141,7 +141,7 @@ export default function FeedComposer({
                 className="text-muted hover:text-ink flex items-center justify-center gap-2 rounded-2xl px-3 text-sm font-medium transition"
                 type="button"
               >
-                <CalendarDays className="h-4 w-4 text-[#fb8c00]" />
+                <CalendarDays className="text-event h-4 w-4" />
                 <span className="max-md:hidden">Event</span>
               </button>
             </div>
@@ -150,7 +150,7 @@ export default function FeedComposer({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="text-ink focus:border-accent/50 flex items-center justify-between gap-2 rounded-full bg-gray-100 px-2 py-0.5 text-[13px] outline-none transition"
+                    className="bg-surface-muted text-ink focus:border-accent/50 flex items-center justify-between gap-2 rounded-full px-2 py-0.5 text-[13px] outline-none transition"
                     type="button"
                   >
                     <VisibilityIcon className="text-muted size-3.5" />

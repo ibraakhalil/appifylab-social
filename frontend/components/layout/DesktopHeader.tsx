@@ -15,6 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import dynamic from "next/dynamic";
+
+const ThemeToggle = dynamic(() => import("@/components/layout/ThemeToggle"), {
+  ssr: false,
+  loading: () => (
+    <div className="border-line bg-surface-muted h-11 w-11 rounded-full border transition" />
+  ),
+});
 
 export default function DesktopHeader() {
   const router = useRouter();
@@ -27,7 +35,7 @@ export default function DesktopHeader() {
 
   return (
     <header
-      className="border-line/70 sticky top-0 z-50 hidden border-b bg-white/90 backdrop-blur lg:block"
+      className="border-line/70 bg-header/90 sticky top-0 z-50 hidden border-b backdrop-blur lg:block"
       style={{ height: "var(--header-height)" }}
     >
       <div
@@ -48,21 +56,22 @@ export default function DesktopHeader() {
         <form className="relative hidden max-w-md flex-1 lg:block">
           <Search className="text-subtle pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2" />
           <input
-            className="bg-surface-muted text-ink focus:border-accent/50 h-11 w-full rounded-full border border-transparent pl-11 pr-4 text-sm outline-none transition focus:bg-white"
+            className="bg-surface-muted text-ink focus:border-accent/50 h-11 w-full rounded-full border border-transparent pl-11 pr-4 text-sm outline-none transition focus:bg-surface"
             type="search"
             placeholder="Search people, groups, and posts"
             aria-label="Search"
           />
         </form>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <nav className="ml-auto">
             <button
-              className="text-muted hover:text-accent relative flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 transition"
+              className="bg-surface-muted text-muted hover:text-accent relative flex h-11 w-11 items-center justify-center rounded-full transition"
               type="button"
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5" />
-              <span className="bg-accent absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white">
+              <span className="bg-accent text-contrast absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold">
                 6
               </span>
             </button>
@@ -80,7 +89,7 @@ export default function DesktopHeader() {
                     name={`${user.firstName} ${user.lastName}`}
                     className="h-11 w-11 text-sm"
                   />
-                  <span className="text-subtle absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-white shadow-sm">
+                  <span className="border-line bg-surface text-subtle absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border shadow-sm">
                     <ChevronDown className="h-3 w-3" />
                   </span>
                 </button>
@@ -116,7 +125,7 @@ export default function DesktopHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="flex items-center gap-3 text-red-600 focus:bg-red-50 focus:text-red-700"
+                  className="text-danger focus:bg-danger-surface focus:text-danger-strong flex items-center gap-3"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout
@@ -124,7 +133,7 @@ export default function DesktopHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="bg-accent hover:bg-accent-strong size-11 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition"></div>
+            <div className="bg-accent hover:bg-accent-strong text-contrast size-11 rounded-full px-5 py-2.5 text-sm font-semibold transition"></div>
           )}
         </div>
       </div>
