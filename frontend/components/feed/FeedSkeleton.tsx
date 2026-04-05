@@ -12,7 +12,7 @@ function SkeletonBlock({ className }: { className?: string }) {
 
 function FeedComposerSkeleton() {
   return (
-    <section className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-card)] sm:p-5">
+    <section className="bg-surface rounded-2xl p-4 shadow-(--shadow-card) sm:p-5">
       <div className="flex items-start gap-3">
         <SkeletonBlock className="mt-1 h-11 w-11 rounded-full" />
         <div className="flex-1 space-y-3">
@@ -83,7 +83,7 @@ function FeedPostSkeleton({
   textLineWidths?: string[];
 }) {
   return (
-    <article className="bg-surface border-line rounded-2xl border p-4 shadow-[var(--shadow-card)] sm:p-5">
+    <article className="bg-surface border-line rounded-2xl border p-4 shadow-(--shadow-card) sm:p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <SkeletonBlock className="h-11 w-11 rounded-full" />
