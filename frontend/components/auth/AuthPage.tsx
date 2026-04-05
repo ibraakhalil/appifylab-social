@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, LockKeyhole, Mail, ShieldCheck, User, UserPlus } from "lucide-react";
+import { toast } from "react-toastify";
 
 import { useAuth } from "@/hooks/useAuth";
 
@@ -70,14 +71,14 @@ function AuthInput({
     <label className="block">
       <span className="text-ink mb-2 block text-sm font-medium">{label}</span>
       <span className="relative block">
-        <Icon className="text-subtle pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <Icon className="text-subtle pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2" />
         <input
           name={name}
           onChange={onChange}
           placeholder={placeholder}
           type={type}
           value={value}
-          className="border-line bg-surface text-ink focus:border-accent/50 focus:ring-accent/10 h-12 w-full rounded-2xl border pl-11 pr-4 text-sm outline-none transition focus:ring-4"
+          className="border-line bg-surface text-ink focus:border-accent/50 focus:ring-accent/10 h-12 w-full rounded-2xl border pr-4 pl-11 text-sm transition outline-none focus:ring-4"
         />
       </span>
     </label>
@@ -133,21 +134,24 @@ export default function AuthPage({ mode }: AuthPageProps) {
           lastName: form.lastName.trim(),
           password: form.password,
         });
+        toast.success("Registration successful! Please login.");
+        router.push("/login");
       } else {
         await login({
           email: form.email.trim(),
           password: form.password,
         });
+        toast.success("Login successful! Welcome back.");
+        router.replace("/");
       }
-
       setForm(initialFormState);
-      router.replace("/");
     } catch (submissionError) {
-      setError(
+      const errorMessage =
         submissionError instanceof Error
           ? submissionError.message
-          : "Unable to complete the request.",
-      );
+          : "Unable to complete the request.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -155,7 +159,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
   return (
     <main className="bg-page relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute left-0 top-0 hidden lg:block">
+      <div className="pointer-events-none absolute top-0 left-0 hidden lg:block">
         <Image
           src="/images/shape1.svg"
           width={174}
@@ -164,7 +168,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
           className="h-auto w-[150px] xl:w-[174px]"
         />
       </div>
-      <div className="pointer-events-none absolute right-0 top-0 hidden lg:block">
+      <div className="pointer-events-none absolute top-0 right-0 hidden lg:block">
         <Image
           src="/images/shape2.svg"
           width={480}
@@ -173,7 +177,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
           className="h-auto w-[360px] xl:w-[480px]"
         />
       </div>
-      <div className="pointer-events-none absolute bottom-0 right-[8%] hidden xl:block">
+      <div className="pointer-events-none absolute right-[8%] bottom-0 hidden xl:block">
         <Image
           src="/images/shape3.svg"
           width={420}
@@ -196,7 +200,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 priority
               />
               {isRegistration ? (
-                <div className="bg-surface absolute -bottom-2 right-8 w-[180px] rounded-lg p-4 shadow-[var(--shadow-popover)]">
+                <div className="bg-surface absolute right-8 -bottom-2 w-[180px] rounded-lg p-4 shadow-(--shadow-popover)">
                   <div className="flex items-center gap-3">
                     <span className="bg-accent/10 text-accent flex h-11 w-11 items-center justify-center rounded-2xl">
                       <UserPlus className="h-5 w-5" />
@@ -213,9 +217,9 @@ export default function AuthPage({ mode }: AuthPageProps) {
         </section>
 
         <section className="mx-auto w-full max-w-[448px]">
-          <div className="bg-surface border-line rounded-[32px] border p-6 shadow-[var(--shadow-panel)] sm:p-8">
+          <div className="bg-surface border-line rounded-[32px] border p-6 shadow-(--shadow-panel) sm:p-8">
             <div className="mb-10 text-center">
-              <h2 className="text-ink text-[28px] font-semibold leading-tight">{content.title}</h2>
+              <h2 className="text-ink text-[28px] leading-tight font-semibold">{content.title}</h2>
               <p className="text-muted mt-2 text-sm">
                 Join Buddy Script and connect with your friends
               </p>

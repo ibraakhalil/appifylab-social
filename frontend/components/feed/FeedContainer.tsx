@@ -35,7 +35,10 @@ export default function FeedContainer() {
   };
 
   return (
-    <div className="space-y-4 pt-4" style={{ minHeight: "calc(100vh - var(--header-height))" }}>
+    <div
+      className="space-y-4 pt-4 max-lg:pb-20"
+      style={{ minHeight: "calc(100vh - var(--header-height))" }}
+    >
       <FeedComposerSection
         currentUserFirstName={currentUserFirstName}
         currentUserName={currentUserName}

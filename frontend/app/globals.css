@@ -211,3 +211,50 @@ img {
     var(--avatar-rose-end)
   );
 }
+
+
+
+
+/* scrollbar styles - using raw CSS to avoid Tailwind ::selection pseudo-element conflicts with Turbopack */
+::-webkit-scrollbar {
+    width: 0.3rem;
+    height: 0px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    display: none;
+    min-height: 2.75rem;
+    border-radius: 9999px;
+    background-color: #40a9ff33;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #1890ffe6;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+    display: block;
+}
+
+body::-webkit-scrollbar {
+    width: 0.45rem;
+}
+
+body::-webkit-scrollbar-thumb {
+    position: static;
+    display: block;
+    min-height: 2.75rem;
+    border-radius: 9999px;
+    background-color: #40a9ff;
+}
+
+@-moz-document url-prefix() {
+    html {
+        scrollbar-width: thin;
+        scrollbar-color: #40a9ff transparent;
+    }
+}
